@@ -3426,12 +3426,11 @@
       ]
     },
     "runtime.native.System.Security.Cryptography.Apple/4.3.0": {
-      "sha512": "DloMk88juo0OuOWr56QG7MNchmafTLYWvABy36izkrLI5VledI0rq28KGs1i9wbpeT9NPQrx/wTf8U2vazqQ3Q==",
+      "sha512": "jwjwlEL0Elv6gwoyaokRn12nv/JE+UW/DXJEbzhjCPvGbef36StnHKc9XaZD/rGWqYicrphZ7eumR/jdmNcjRg==",
       "type": "package",
       "path": "runtime.native.system.security.cryptography.apple/4.3.0",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
@@ -3482,12 +3481,11 @@
       ]
     },
     "runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography.Apple/4.3.0": {
-      "sha512": "kVXCuMTrTlxq4XOOMAysuNwsXWpYeboGddNGpIgNSZmv1b6r/s/DPk0fYMB7Q5Qo4bY68o48jt4T4y5BVecbCQ==",
+      "sha512": "Kh9W4agE0r/hK8AX1LvyQI2NrKHBL8pO0gRoDTdDb0LL6Ta1Z2OtFx3lOaAE0ZpCUc/dt9Wzs3rA7a3IsKdOVA==",
       "type": "package",
       "path": "runtime.osx.10.10-x64.runtime.native.system.security.cryptography.apple/4.3.0",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "runtime.osx.10.10-x64.runtime.native.system.security.cryptography.apple.4.3.0.nupkg.sha512",
@@ -4317,12 +4315,11 @@
       ]
     },
     "System.Collections.NonGeneric/4.3.0": {
-      "sha512": "prtjIEMhGUnQq6RnPEYLpFt8AtLbp9yq2zxOSrY7KJJZrw25Fi97IzBqY7iqssbM61Ek5b8f3MG/sG1N2sN5KA==",
+      "sha512": "LE/oChpRvkSi3U25u0KnJcI44JeDZ1QJCyN4qFDx2uusEypdqR24w7lKYw21eYe5esuCBuc862wRmpF63Yy1KQ==",
       "type": "package",
       "path": "system.collections.nongeneric/4.3.0",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -6649,12 +6646,11 @@
       ]
     },
     "System.Runtime.Serialization.Primitives/4.3.0": {
-      "sha512": "Wz+0KOukJGAlXjtKr+5Xpuxf8+c8739RI1C+A2BoQZT+wMCCoMDDdO8/4IRHfaVINqL78GO8dW8G2lW/e45Mcw==",
+      "sha512": "2Z5t70a2SwMsfQDp9KOclaZNyQhfIga2gppq9lIUDM1A4ohTshn4JqT7ir8bvIhXgorWKYDAr6rPzEbi/nTGKg==",
       "type": "package",
       "path": "system.runtime.serialization.primitives/4.3.0",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -8052,23 +8048,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\thami\\.nuget\\packages\\": {},
+    "C:\\Users\\Felipe Lima\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\thami\\source\\repos\\GloboImprensa\\GloboImprensa\\GloboImprensa.csproj",
+      "projectUniqueName": "C:\\Users\\Felipe Lima\\OneDrive - Inmetrics\\Arquivos Thamires\\Thamires\\Desafios\\Com sucesso\\GloboImprensa\\GloboImprensa\\GloboImprensa.csproj",
       "projectName": "GloboImprensa",
-      "projectPath": "C:\\Users\\thami\\source\\repos\\GloboImprensa\\GloboImprensa\\GloboImprensa.csproj",
-      "packagesPath": "C:\\Users\\thami\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\thami\\source\\repos\\GloboImprensa\\GloboImprensa\\obj\\",
+      "projectPath": "C:\\Users\\Felipe Lima\\OneDrive - Inmetrics\\Arquivos Thamires\\Thamires\\Desafios\\Com sucesso\\GloboImprensa\\GloboImprensa\\GloboImprensa.csproj",
+      "packagesPath": "C:\\Users\\Felipe Lima\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Felipe Lima\\OneDrive - Inmetrics\\Arquivos Thamires\\Thamires\\Desafios\\Com sucesso\\GloboImprensa\\GloboImprensa\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\thami\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Felipe Lima\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -8097,6 +8093,7 @@
             "version": "[15.9.0, )"
           },
           "Microsoft.NETCore.App": {
+            "suppressParent": "All",
             "target": "Package",
             "version": "[2.1.0, )",
             "autoReferenced": true

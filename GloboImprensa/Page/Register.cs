@@ -4,6 +4,7 @@ using System.Text;
 using GloboImprensa.Hooks;
 using OpenQA.Selenium;
 
+
 namespace GloboImprensa.Page
 {
     public class Register
@@ -34,6 +35,7 @@ namespace GloboImprensa.Page
             private By ByBtnSubmit;
             private _Wait _Wait;
             private _Screenshot _Screenshot;
+            private _Write _Write;
 
         public Register(IWebDriver Driver)
         {
@@ -41,6 +43,7 @@ namespace GloboImprensa.Page
 
             _Wait = new _Wait(driver);
             _Screenshot = new _Screenshot(driver);
+            _Write = new _Write(driver);
 
             ByFirstName = By.Id("id_first_name") ;
             ByLastName = By.Id("id_last_name");
@@ -98,25 +101,25 @@ namespace GloboImprensa.Page
             )
         {
            
-            driver.FindElement(ByFirstName).SendKeys(FirstName);
-            driver.FindElement(ByLastName).SendKeys(LastName);
-            driver.FindElement(ByNickname).SendKeys(Nickname);
-            driver.FindElement(BySex).SendKeys(Sex);
-            driver.FindElement(ByEmail).SendKeys(Email);
-            driver.FindElement(ByOffice).SendKeys(Office);
-            driver.FindElement(ByPublishingCompany).SendKeys(PublishingCompany);
-            driver.FindElement(ByCarrier).SendKeys(Carrier);
-            driver.FindElement(ByCountry).SendKeys(Country);
-            driver.FindElement(ByState).SendKeys(State);
-            driver.FindElement(ByCity).SendKeys(City);
-            driver.FindElement(ByDDDTelephone).SendKeys(DDDTelephone);
-            driver.FindElement(ByTelephone).SendKeys(Telephone);
-            driver.FindElement(ByDDDCellPhone).SendKeys(DDDCellPhone);
-            driver.FindElement(ByCellPhone).SendKeys(CellPhone);
-            driver.FindElement(ByInstagram).SendKeys(Instagram);
-            driver.FindElement(ByTwitter).SendKeys(Twitter);
-            driver.FindElement(ByPassword).SendKeys(Password);
-            driver.FindElement(ByRepeatPassword).SendKeys(RepeatPassword);
+            _Write.__Write(ByFirstName,FirstName);
+            _Write.__Write(ByLastName, LastName);
+            _Write.__Write(ByNickname, Nickname);
+            _Write.__Write(BySex, Sex);
+            _Write.__Write(ByEmail, Email);
+            _Write.__Write(ByOffice,Office);
+            _Write.__Write(ByPublishingCompany, PublishingCompany);
+            _Write.__Write(ByCarrier, Carrier);
+            _Write.__Write(ByCountry, Country);
+            _Write.__Write(ByState,State);
+            _Write.__Write(ByCity, City);
+            _Write.__Write(ByDDDTelephone, DDDTelephone);
+            _Write.__Write(ByDDDCellPhone, DDDCellPhone);
+            _Write.__Write(ByCellPhone, CellPhone);
+            _Write.__Write(ByTelephone,Telephone);
+            _Write.__Write(ByInstagram, Instagram);
+            _Write.__Write(ByTwitter, Twitter);
+            _Write.__Write(ByPassword, Password);
+            _Write.__Write(ByRepeatPassword, RepeatPassword);
             driver.FindElement(ByReceiveInformation).Click();
             driver.FindElement(ByTerm).Click();
             _Screenshot.PrintScreenshot();

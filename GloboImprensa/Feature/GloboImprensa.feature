@@ -24,7 +24,7 @@ Cenário:  Cadastra no Globo Imprensa
 
 		| FirstName | LastName  | Nickname | Sex      | Email              | Office | PublishingCompany        | Carrier | Country | State               | City   | DDDTelephone | Telephone | DDDCellPhone | CellPhone | Instagram | Twitter | Password    | RepeatPassword | Message                                                                 |
 		#Positivo
-		| Thamires  | Fernandes | Mendes   | Feminino | T798688@gmail.com  | Editor | Cultura / Entretenimento | Teste   | Brasil  | RJ - Rio de Janeiro | Tanguá | 21           | 21897656  | 21           | 23467809  | thayn     | theuu   | Thatha9897@ | Thatha9897@    | Seu cadastro foi realizado. Aguarde a revisão e aprovação da sua conta. |
+		| Thamires  | Fernandes | Mendes   | Feminino | T4ert8@gmail.com  | Editor | Cultura / Entretenimento | Teste   | Brasil  | RJ - Rio de Janeiro | Tanguá | 21           | 21897656  | 21           | 23467809  | thayn     | theuu   | Thatha9897@ | Thatha9897@    | Seu cadastro foi realizado. Aguarde a revisão e aprovação da sua conta. |
 		#Negativo
 		| Thamires  | Fernandes | Mendes   | Feminino | Tyyhw@gmail.com    | Editor | Cultura / Entretenimento | Teste   | Brasil  | RJ - Rio de Janeiro | Tanguá | 21           | 21897656  | 21           | 23467809  | thayn     | theuu   | Thatha9897@ | Thatha9897@    | Já existe um cadastro com este e-mail.                                  |
 		|           |           |          |          |                    |        |                          |         |         |                     |        |              |           |              |           |           |         |             |                | Solicitação de cadastro                                                 |

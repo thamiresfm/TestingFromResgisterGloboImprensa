@@ -138,7 +138,7 @@ this.ScenarioInitialize(scenarioInfo);
         public virtual void CadastraNoGloboImprensa_Variant0()
         {
 #line 14
-this.CadastraNoGloboImprensa("Thamires", "Fernandes", "Mendes", "Feminino", "T7643988@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "Brasil", "RJ - Rio de Janeiro", "Tanguá", "21", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897@", "Thatha9897@", "Seu cadastro foi realizado. Aguarde a revisão e aprovação da sua conta.", ((string[])(null)));
+this.CadastraNoGloboImprensa("Thamires", "Fernandes", "Mendes", "Feminino", "T4ert8@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "Brasil", "RJ - Rio de Janeiro", "Tanguá", "21", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897@", "Thatha9897@", "Seu cadastro foi realizado. Aguarde a revisão e aprovação da sua conta.", ((string[])(null)));
 #line hidden
         }
         
@@ -162,7 +162,7 @@ this.CadastraNoGloboImprensa("", "", "", "", "", "", "", "", "", "", "", "", "",
         public virtual void CadastraNoGloboImprensa_Variant3()
         {
 #line 14
-this.CadastraNoGloboImprensa("Carlar", "", "Caca", "Feminino", "T233w@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "21", "21897656", "21", "23467809", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897$", "Thatha9897$", "Solicitação de cadastro", ((string[])(null)));
+this.CadastraNoGloboImprensa("Carlar", "", "Caca", "Feminino", "T2r43w@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "21", "21897656", "21", "23467809", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897$", "Thatha9897$", "Solicitação de cadastro", ((string[])(null)));
 #line hidden
         }
         
@@ -178,7 +178,7 @@ this.CadastraNoGloboImprensa("Carlar", "Costa", "Caca", "Feminino", "", "Editor"
         public virtual void CadastraNoGloboImprensa_Variant5()
         {
 #line 14
-this.CadastraNoGloboImprensa("Carlar", "Costa", "Caca", "Feminino", "Thu60hw@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "21", "21897656", "21", "23467809", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897$", "", "Solicitação de cadastro", ((string[])(null)));
+this.CadastraNoGloboImprensa("Carlar", "Costa", "Caca", "Feminino", "45tgh@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "21", "21897656", "21", "23467809", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897$", "", "Solicitação de cadastro", ((string[])(null)));
 #line hidden
         }
         
@@ -186,7 +186,7 @@ this.CadastraNoGloboImprensa("Carlar", "Costa", "Caca", "Feminino", "Thu60hw@gma
         public virtual void CadastraNoGloboImprensa_Variant6()
         {
 #line 14
-this.CadastraNoGloboImprensa("Carlar", "Costa", "Caca", "Feminino", "iok67@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "21", "21897656", "21", "23467809", "21897656", "21", "23467809", "thayn", "theuu", "", "Thatha9897$", "Solicitação de cadastro", ((string[])(null)));
+this.CadastraNoGloboImprensa("Carlar", "Costa", "Caca", "Feminino", "io322k67@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "21", "21897656", "21", "23467809", "21897656", "21", "23467809", "thayn", "theuu", "", "Thatha9897$", "Solicitação de cadastro", ((string[])(null)));
 #line hidden
         }
         
