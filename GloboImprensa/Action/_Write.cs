@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using OpenQA.Selenium;
 
-namespace GloboImprensa.Hooks
+namespace GloboImprensa.Action
 {
     public class _Write
     {

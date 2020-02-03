@@ -26,7 +26,7 @@ namespace GloboImprensa.Step
         [Given(@"que eu navegue para tela de cadastro")]
         public void DadoQueEuNavegueParaTelaDeCadastro()
         {
-            login.Visitar();
+            login.Visit();
         }
 
         [When(@"preencho  os campos de (.*), (.*), (.*), (.*), (.*), (.*) ,(.*), (.*), (.*), (.*), (.*), (.*), (.*), (.*), (.*), (.*), (.*), (.*) e (.*)")]
@@ -51,7 +51,7 @@ namespace GloboImprensa.Step
                                               , string RepeatPassword
             )
         {
-            login.PreencherDados(
+            login.FillData(
                                 FirstName
                                 , LastName
                                 , Nickname

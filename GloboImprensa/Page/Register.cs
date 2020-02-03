@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using GloboImprensa.Hooks;
+using GloboImprensa.Action;
 using OpenQA.Selenium;
 
 
@@ -69,13 +69,13 @@ namespace GloboImprensa.Page
             ByBtnSubmit = By.XPath("//button[text()='SOLICITAR CADASTRO']");
         }
 
-        public void Visitar()
+        public void Visit()
         {
             driver.Navigate().GoToUrl("https://imprensa.globo.com/cadastro/");
             _Screenshot.PrintScreenshot();
         }
 
-        public void PreencherDados(
+        public void FillData(
                                     string FirstName
                                     , string LastName
                                     , string Nickname

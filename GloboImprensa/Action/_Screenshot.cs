@@ -5,7 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-namespace GloboImprensa.Hooks
+namespace GloboImprensa.Action
 {
     class _Screenshot
     {

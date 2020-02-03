@@ -16,13 +16,12 @@ Cenário:  Cadastrar no Globo Imprensa com sucesso
 
 		Exemplos: 
 		
-		
+			#Positivo
 		| FirstName | LastName  | Nickname | Sex      | Email                   | Office | PublishingCompany        | Carrier | Country | State               | City   | DDDTelephone | Telephone | DDDCellPhone | CellPhone | Instagram | Twitter | Password    | RepeatPassword | Message                                                                 |
-		#Positivo
 		| Thamires  | Fernandes | Mendes   | Feminino | T4ttgt8@gmail.com | Editor | Cultura / Entretenimento | Teste   | Brasil  | RJ - Rio de Janeiro | Tanguá | 21           | 21897656  | 21           | 23467809  | thayn     | theuu   | Thatha9897@ | Thatha9897@    | Seu cadastro foi realizado. Aguarde a revisão e aprovação da sua conta. |
 		
 		
-		Cenário:  Cadastrar no Globo Imprensa sem sucesso
+Cenário:  Cadastrar no Globo Imprensa sem sucesso
 
 		Dado que eu navegue para tela de cadastro
 		Quando preencho  os campos de <FirstName>, <LastName>, <Nickname>, <Sex>, <Email>, <Office> ,<PublishingCompany>, <Carrier>, <Country>, <State>, <City>, <DDDTelephone>, <Telephone>, <DDDCellPhone>, <CellPhone>, <Instagram>, <Twitter>, <Password> e <RepeatPassword>
