@@ -95,9 +95,6 @@ namespace GloboImprensa.Page
                                     , string Twitter
                                     , string Password
                                     , string RepeatPassword
-
-
-
             )
         {
            

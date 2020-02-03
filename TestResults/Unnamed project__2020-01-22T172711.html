@@ -1,0 +1,1930 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+		<title>Unnamed project Test Execution Report</title>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript">
+            /**
+            * jQuery.fn.sortElements
+            * --------------
+            * #author James Padolsey (http://james.padolsey.com)
+            * #version 0.11
+            * #updated 18-MAR-2010
+            * #url https://raw.github.com/jamespadolsey/jQuery-Plugins/master/sortElements/jquery.sortElements.js
+            * --------------
+            * #param Function comparator:
+            *   Exactly the same behaviour as [1,2,3].sort(comparator)
+            *   
+            * #param Function getSortable
+            *   A function that should return the element that is
+            *   to be sorted. The comparator will run on the
+            *   current collection, but you may want the actual
+            *   resulting sort to occur on a parent or another
+            *   associated element.
+            *   
+            *   E.g. $('td').sortElements(comparator, function(){
+            *      return this.parentNode; 
+            *   })
+            *   
+            *   The <td>'s parent (<tr>) will be sorted instead
+            *   of the <td> itself.
+            */
+            jQuery.fn.sortElements = (function () {
+
+                var sort = [].sort;
+
+                return function (comparator, getSortable) {
+
+                    getSortable = getSortable || function () { return this; };
+
+                    var placements = this.map(function () {
+
+                        var sortElement = getSortable.call(this),
+                parentNode = sortElement.parentNode,
+
+                        // Since the element itself will change position, we have
+                        // to have some way of storing it's original position in
+                        // the DOM. The easiest way is to have a 'flag' node:
+                nextSibling = parentNode.insertBefore(
+                    document.createTextNode(''),
+                    sortElement.nextSibling
+                );
+
+                        return function () {
+
+                            if (parentNode === this) {
+                                throw new Error(
+                        "You can't sort elements if any one is a descendant of another."
+                    );
+                            }
+
+                            // Insert before flag:
+                            parentNode.insertBefore(this, nextSibling);
+                            // Remove flag:
+                            parentNode.removeChild(nextSibling);
+
+                        };
+
+                    });
+
+                    return sort.call(this, comparator).each(function (i) {
+                        placements[i].call(getSortable.call(this));
+                    });
+
+                };
+
+            })();
+        </script>
+        <script type="text/javascript">
+            jQuery.fn.setBarSizes = (function () {
+                return function (metricName, maxBarSize, min) {
+                    var max = Math.max.apply(Math, $.makeArray($(this).map(function () { return Number($(this).attr('data-sr-' + metricName)); })));
+                    var scale = 1.0;
+                    while (max > 0.0 && max <= 10.0) {
+                        scale = scale * 10.0;
+                        max = max * 10.0;
+                    }
+                    max = (Math.ceil(max / 2) * 2) / scale;
+
+                    this.each(function () {
+                        var barAnchor = $(this).find('a');
+                        var actual = $(this).attr('data-sr-' + metricName);
+                        var newHeight = Math.max(Math.round(maxBarSize * (actual - min) / (max - min)), 2);
+                        barAnchor.css({ height: newHeight });
+                    });
+
+                    var unit = "";
+                    if (metricName.substr(metricName.length - 4, 4) === "time")
+                        unit = "s";
+
+                    $('#testview .scale-min-label').each(function () {
+                        $(this).text(min.toString() + unit);
+                    });
+                    $('#testview .scale-max-label').each(function () {
+                        $(this).text(max.toString() + unit);
+                    });
+                    var mid = max / 2;
+                    $('#testview .scale-mid-label').each(function () {
+                        $(this).text(mid.toString() + unit);
+                    });
+                };
+            })();
+
+            function getComparer(metricName, isDesc) {
+                return function (a, b) {
+                    var aNumber = Number($(a).attr('data-sr-' + metricName));
+                    var bNumber = Number($(b).attr('data-sr-' + metricName));
+                    var result = aNumber > bNumber ? 1 : (aNumber < bNumber ? -1 : 0);
+                    if (isDesc)
+                        result = -1 * result;
+
+                    if (result == 0 && metricName != "order")
+                        result = getComparer("order", false)(a, b);
+
+                    return result;
+                };
+            }
+
+            var currentSort = "";
+            function doSort(allowToggleDesc) {
+                var newSort = $("input[name='barSortOrder']:checked").val();
+                if (allowToggleDesc && currentSort == newSort) {
+                    $('#barSortDesc').click();
+                    doSort(false);
+                    return;
+                }
+                currentSort = newSort;
+                $('#testview td.testview-item').sortElements(getComparer(newSort, $('#barSortDesc').is(':checked')));
+            }
+
+
+            function doSetHeights(allowSort) {
+                var selectedMetric = $("input[name='barHeight']:checked").val();
+                $('#testview td.testview-item').setBarSizes(selectedMetric, 60, 0.0);
+
+                if (allowSort && currentSort != selectedMetric) {
+                    var $radios = $("input[name='barSortOrder']");
+                    $radios.filter('[value=' + selectedMetric + ']').attr('checked', true);
+                    $("#barSortDesc").attr("checked", [true]);
+                    doSort(false);
+                }
+            }
+
+            $(document).ready(function () {
+                $("input[name='barSortOrder']").click(function () { doSort(true); return true; });
+                $("input[name='barSortDesc']").change(function () { doSort(false); });
+                $("input[name='barHeight']").change(function () { doSetHeights(true); });
+
+                doSort(false);
+                doSetHeights(false);
+
+                $("div.scrollable").css({ 'overflow': 'auto' });
+            });
+        </script>
+
+        <style type="text/css">
+            body 
+            {
+                color: #000000;
+                font-family: Arial,Liberation Sans,DejaVu Sans,sans-serif;
+                line-height: 130%;
+            }
+            h1 {
+                font-family: Trebuchet MS,Liberation Sans,DejaVu Sans,sans-serif;
+                font-size: 170%;
+                font-weight: bold;
+            }            
+            h2 {
+                font-family: Trebuchet MS,Liberation Sans,DejaVu Sans,sans-serif;
+                font-size: 130%;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }            
+            h3 {
+                font-family: Trebuchet MS,Liberation Sans,DejaVu Sans,sans-serif;
+                font-size: 120%;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }            
+            a.bar
+            {
+                text-decoration: none;
+                display: block;
+                line-height: 1px;
+            }
+            .description
+            {
+                font-style: italic;
+            }
+            .log 
+            {
+                width: 600px;
+                white-space: pre-wrap;
+                display: block;
+                margin: 0px;
+            }
+            .errorMessage 
+            {
+                width: 600px;
+                color: Red;
+                font-weight: bold;
+            }
+            .stackTrace 
+            {
+                width: 600px;
+                white-space: pre-wrap;
+                font-style: italic;
+                color: Red;
+                display: block;
+            }
+            table.testEvents
+            {
+                border: solid 1px #e8eef4;
+                border-collapse: collapse;
+            }
+            table.testEvents td
+            {
+                vertical-align: top;
+                padding: 5px;
+                border: solid 1px #e8eef4;
+            }
+            table.testEvents th
+            {
+                padding: 6px 5px;
+                text-align: left;
+                background-color: #e8eef4;
+                border: solid 1px #e8eef4;                
+            }
+            .comment
+            {
+                font-style: italic;
+                font-size: smaller;
+            }
+            .startupBar
+            {
+                background-color: #EEEEEE;
+                cursor: default;
+            }
+            
+            .colorSucceeded
+            {
+                background-color: #90ED7B;
+            }
+            .colorIgnored
+            {
+                background-color: #FFFF85;
+            }
+            .colorPending
+            {
+                background-color: #D47BED;
+            }
+            .colorNothingToRun
+            {
+                background-color: #CCCCFF;
+            }
+            .colorSkipped
+            {
+                background-color: #CCCCFF;
+            }
+            .colorInconclusive
+            {
+                background-color: #7BEDED;
+            }
+            .colorCleanupFailed
+            {
+                background-color: #FFCCCC;
+            }
+            .colorRandomlyFailed
+            {
+                background-color: #EDB07B;
+            }
+            .colorFailed
+            {
+                background-color: #ED5F5F;
+            }
+            .colorInitializationFailed
+            {
+                background-color: #FF0000;
+            }
+            .colorFrameworkError
+            {
+                background-color: #FF0000;
+            }
+            ul.subNodeLinks
+            {
+                padding-left: 20px;
+                margin: 0px;
+            }
+            ul.subNodeLinks li
+            {
+                list-style: none;
+            }
+            
+            /* views general */
+            div.scrollable
+            {
+                /*overflow: auto; - thsi has to be set from js, because of an IE9 bug */
+            }
+            div.viewbox
+            {
+                position: relative;
+                border: 3px solid #e8eef4;
+            }
+            div.viewbox table
+            {
+                border: 0px;
+            }
+                        
+            /* testview */
+            #testview
+            {
+                padding-top: 23px;
+            }
+            
+            table.testview-items td
+            {
+                vertical-align: bottom;
+                padding: 0px 1px 0px 1px;
+            }
+            td.right-padding, td.left-padding
+            {
+                width: 25px;
+                min-width: 25px;
+            }
+            table.testview-items a.bar
+            {
+                width: 5px;
+            }
+            table.testview-items tr.testview-items-row
+            {
+                height: 60px;
+            }
+            
+            /* scale */
+            table.vertical-scale 
+            {
+                position: absolute;
+                top: 23px;
+                left: 0px;
+                width: 100%;
+                z-index: -100;
+            }
+            table.vertical-scale td, tr.horizontal-scale td
+            {
+                font-size: 60%;
+                line-height: normal;
+            }
+            table.vertical-scale tr.scale-max, table.vertical-scale tr.scale-mid 
+            {
+                height: 30px;
+            }
+            tr.horizontal-scale, table.vertical-scale tr.scale-min 
+            {
+                height: 12px;
+            }
+            
+            td.scale-max-label, td.scale-mid-label, td.scale-min-label
+            {
+                border-top: solid 1px #E6E6E6;
+                text-align: left;
+                vertical-align: top;
+            }
+            td.scale-10-label
+            {
+                border-left: solid 1px #E6E6E6;
+                text-align: left;
+                vertical-align: bottom;
+                padding-left: 1px;
+            }
+            tr.scale-mid td, tr.scale-min td, tr.scale-max td
+            {
+                border-top: solid 1px #E6E6E6;
+            }
+           
+            
+            /* bar-control */
+            #bar-control
+            {
+                font-size: 60%;
+                line-height: normal;
+                position: absolute;
+                right: 0px;
+                top: 0px;
+            }
+            #bar-control label
+            {
+                font-weight: bold;
+                vertical-align: middle;
+            }
+            #bar-control .option
+            {
+                vertical-align: middle;
+                text-transform: lowercase;
+            }
+            #bar-control input[type="checkbox"]
+            {
+                padding: 0 2px 0 3px;
+            }
+            #bar-control input
+            {
+                vertical-align: top;
+                height: 12px;
+                margin: 0px;
+                padding: 0px;
+            }
+            #bar-control div
+            {
+                float: right;
+                margin: 3px 5px 3px 5px;
+            }
+
+            /* timeline view */
+            #timelineview
+            {
+                padding-top: 5px;
+            }
+            table.timelineview a
+            {
+                height: 20px;
+            }
+            table.timelineview td
+            {
+                vertical-align: bottom;
+                padding: 0px 1px 0px 0px;
+                border: 0px;
+            }
+            tr.thread-items-row
+            {
+                height: 25px;
+            }
+            tr.thread-items-row td
+            {
+                vertical-align: bottom;
+            }
+            td.thread-label
+            {
+                padding: 0px 6px 0px 6px;
+                text-align: right;
+                line-height: 18px;
+                vertical-align: bottom;
+            }
+            th.thread-label
+            {
+                padding: 3px 6px 0px 6px;
+                line-height: 18px;
+                text-align: left;
+                vertical-align: bottom;
+            }
+        </style>
+	</head>
+	<body>
+        <h1>Unnamed project Test Execution Report</h1>
+        
+    <ul>
+        <li>Project: Unnamed project</li>
+        <li>Configuration: </li>
+        <li>Test Assemblies: C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1\GloboImprensa.dll</li>
+        <li>Start Time: 22/01/2020 17:27:18</li>
+        <li>Duration: 00:07:55.4417184</li>
+        <li>Test Threads: 1</li>
+    </ul>
+
+
+        <h2>Result: 2 failed (2 randomly failed)</h2>
+        <table class="testEvents">
+                <tr>
+        <th colspan="2">Success rate</th>
+        <th>Tests</th>
+        <th>Succeeded</th>
+        <th>Failed</th>
+        <th>Pending</th>
+        <th>Ignored</th>
+        <th>Skipped</th>
+    </tr>
+
+                <td>
+            71%
+    </td>
+    <td>
+            <table class="timelineview" cellpadding="0" cellspacing="0">
+        <tr>
+    <td>
+        <a class="bar colorSucceeded" 
+           style="width: 142px;" 
+           title="5 succeeded" 
+                   ></a>
+    </td>
+    <td>
+        <a class="bar colorRandomlyFailed" 
+           style="width: 56px;" 
+           title="2 randomly failed" 
+                          href="#error_summary"
+        ></a>
+    </td>
+        </tr>
+    </table>
+
+    </td>
+    <td>7 (test executions: 11)</td>
+    <td>5</td>
+    <td>2</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+
+        </table>
+        
+        <h2>Test Timeline Summary</h2>
+
+        <div id="timelineview" class="viewbox">
+            <div class="scrollable">
+                <table cellpadding="0" cellspacing="0">
+                    <tr>
+                        <th class="thread-label" colspan="2">thread</th>
+                    </tr>
+                        <tr class="thread-items-row">
+                            <td class="thread-label" title="Machine: LP1739">#0</td>
+                            <td colspan="2">
+                                <table class="timelineview" cellpadding="0" cellspacing="0">
+                                    <tr>
+
+                                            <td>
+        <a
+            class="bar startupBar" 
+            style="width: 3px;" 
+                title="test thread startup" 
+        >&nbsp;</a>
+    </td>
+
+    <td>
+        <a
+            class="bar colorFailed" 
+            style="width: 12px;" 
+                title="Cadastrar no Globo Imprensa, Variant 0 (in Cadastrar no site Globo Imprensa)" 
+                href="#t1845292433.0"
+        >&nbsp;</a>
+    </td>
+    <td>
+        <a
+            class="bar colorFailed" 
+            style="width: 10px;" 
+                title="Cadastrar no Globo Imprensa, Variant 0 (in Cadastrar no site Globo Imprensa) retry #1" 
+                href="#t1845292433.1"
+        >&nbsp;</a>
+    </td>
+    <td>
+        <a
+            class="bar colorSucceeded" 
+            style="width: 7px;" 
+                title="Cadastrar no Globo Imprensa, Variant 0 (in Cadastrar no site Globo Imprensa) retry #2" 
+                href="#t1845292433.2"
+        >&nbsp;</a>
+    </td>
+    <td>
+        <a
+            class="bar colorSucceeded" 
+            style="width: 3px;" 
+                title="Cadastrar no Globo Imprensa, Variant 1 (in Cadastrar no site Globo Imprensa)" 
+                href="#t-1961535754.0"
+        >&nbsp;</a>
+    </td>
+    <td>
+        <a
+            class="bar colorSucceeded" 
+            style="width: 3px;" 
+                title="Cadastrar no Globo Imprensa, Variant 2 (in Cadastrar no site Globo Imprensa)" 
+                href="#t-1290799961.0"
+        >&nbsp;</a>
+    </td>
+    <td>
+        <a
+            class="bar colorSucceeded" 
+            style="width: 5px;" 
+                title="Cadastrar no Globo Imprensa, Variant 3 (in Cadastrar no site Globo Imprensa)" 
+                href="#t-794527684.0"
+        >&nbsp;</a>
+    </td>
+    <td>
+        <a
+            class="bar colorFailed" 
+            style="width: 9px;" 
+                title="Cadastrar no Globo Imprensa, Variant 4 (in Cadastrar no site Globo Imprensa)" 
+                href="#t-480070907.0"
+        >&nbsp;</a>
+    </td>
+    <td>
+        <a
+            class="bar colorSucceeded" 
+            style="width: 5px;" 
+                title="Cadastrar no Globo Imprensa, Variant 4 (in Cadastrar no site Globo Imprensa) retry #1" 
+                href="#t-480070907.1"
+        >&nbsp;</a>
+    </td>
+    <td>
+        <a
+            class="bar colorSucceeded" 
+            style="width: 4px;" 
+                title="Cadastrar no Globo Imprensa, Variant 4 (in Cadastrar no site Globo Imprensa) retry #2" 
+                href="#t-480070907.2"
+        >&nbsp;</a>
+    </td>
+    <td>
+        <a
+            class="bar colorSucceeded" 
+            style="width: 3px;" 
+                title="Cadastrar no Globo Imprensa, Variant 5 (in Cadastrar no site Globo Imprensa)" 
+                href="#t12264602.0"
+        >&nbsp;</a>
+    </td>
+    <td>
+        <a
+            class="bar colorSucceeded" 
+            style="width: 3px;" 
+                title="Cadastrar no Globo Imprensa, Variant 6 (in Cadastrar no site Globo Imprensa)" 
+                href="#t682482251.0"
+        >&nbsp;</a>
+    </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    <tr class="horizontal-scale">
+                        <td>&nbsp;</td>
+                            <td class="scale-10-label" style="width: 70px;min-width: 70px;">0s</td>
+                        <td class="scale-10-label">432s</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        
+    <h2>Test Result View</h2>
+    <div id="testview" class="viewbox">
+        <div id="bar-control">
+            <div id="bar-control-sort">
+                <label>sort by:</label>
+                <span class="option"><input type="radio" name="barSortOrder" value="exectime" />Time</span>
+                <span class="option"><input type="radio" name="barSortOrder" value="acttime" />Act Time</span>
+                <span class="option"><input type="radio" name="barSortOrder" value="order" />Execution</span>
+                <span class="option"><input type="radio" name="barSortOrder" value="rescode" checked="checked" />Result</span>
+                <span class="option"><input type="checkbox" name="barSortDesc" id="barSortDesc" checked="checked" />desc</span>
+            </div>
+            <div id="bar-control-heights">
+                <label>heights:</label>
+                <span class="option"><input type="radio" checked="checked" name="barHeight" value="exectime" />Time</span>
+                <span class="option"><input type="radio" name="barHeight" value="acttime" />Act Time</span>
+            </div>
+        </div>
+        <table class="vertical-scale" cellpadding="0" cellspacing="0">
+            <tr class="scale-max">
+                <td class="left-padding scale-max-label">&nbsp;</td>
+                <td colspan="11">&nbsp;</td>
+                <td class="right-padding">&nbsp;</td>
+            </tr>
+            <tr class="scale-mid">
+                <td class="left-padding scale-mid-label">&nbsp;</td>
+                <td colspan="11">&nbsp;</td>
+                <td class="right-padding">&nbsp;</td>
+            </tr>
+            <tr class="scale-min">
+                <td class="left-padding scale-min-label">&nbsp;</td>
+                <td colspan="11">&nbsp;</td>
+                <td class="right-padding">&nbsp;</td>
+            </tr>
+        </table>
+        <div class="scrollable">
+            <table class="testview-items" cellpadding="0" cellspacing="0">
+                <tr class="testview-items-row">
+                    <td class="left-padding">&nbsp;</td>
+    <td class="testview-item" 
+        data-sr-exectime="46.5930242" data-sr-rescode="110" data-sr-order="2" data-sr-acttime="25.729">
+        <a
+            class="bar colorSucceeded" 
+            style="height: 28px;"
+            title="Cadastrar no Globo Imprensa, Variant 0 (in Cadastrar no site Globo Imprensa) retry #2"
+            href="#t1845292433.2">&nbsp;</a>
+    </td>
+    <td class="testview-item" 
+        data-sr-exectime="22.1401381" data-sr-rescode="110" data-sr-order="3" data-sr-acttime="6.671">
+        <a
+            class="bar colorSucceeded" 
+            style="height: 13px;"
+            title="Cadastrar no Globo Imprensa, Variant 1 (in Cadastrar no site Globo Imprensa)"
+            href="#t-1961535754.0">&nbsp;</a>
+    </td>
+    <td class="testview-item" 
+        data-sr-exectime="19.6308593" data-sr-rescode="110" data-sr-order="4" data-sr-acttime="2.999">
+        <a
+            class="bar colorSucceeded" 
+            style="height: 12px;"
+            title="Cadastrar no Globo Imprensa, Variant 2 (in Cadastrar no site Globo Imprensa)"
+            href="#t-1290799961.0">&nbsp;</a>
+    </td>
+    <td class="testview-item" 
+        data-sr-exectime="43.0678395" data-sr-rescode="110" data-sr-order="5" data-sr-acttime="3.353">
+        <a
+            class="bar colorSucceeded" 
+            style="height: 25px;"
+            title="Cadastrar no Globo Imprensa, Variant 3 (in Cadastrar no site Globo Imprensa)"
+            href="#t-794527684.0">&nbsp;</a>
+    </td>
+    <td class="testview-item" 
+        data-sr-exectime="38.3026633" data-sr-rescode="110" data-sr-order="7" data-sr-acttime="4.136">
+        <a
+            class="bar colorSucceeded" 
+            style="height: 23px;"
+            title="Cadastrar no Globo Imprensa, Variant 4 (in Cadastrar no site Globo Imprensa) retry #1"
+            href="#t-480070907.1">&nbsp;</a>
+    </td>
+    <td class="testview-item" 
+        data-sr-exectime="31.348225" data-sr-rescode="110" data-sr-order="8" data-sr-acttime="4.61">
+        <a
+            class="bar colorSucceeded" 
+            style="height: 19px;"
+            title="Cadastrar no Globo Imprensa, Variant 4 (in Cadastrar no site Globo Imprensa) retry #2"
+            href="#t-480070907.2">&nbsp;</a>
+    </td>
+    <td class="testview-item" 
+        data-sr-exectime="23.878273" data-sr-rescode="110" data-sr-order="9" data-sr-acttime="3.987">
+        <a
+            class="bar colorSucceeded" 
+            style="height: 14px;"
+            title="Cadastrar no Globo Imprensa, Variant 5 (in Cadastrar no site Globo Imprensa)"
+            href="#t12264602.0">&nbsp;</a>
+    </td>
+    <td class="testview-item" 
+        data-sr-exectime="11.8981429" data-sr-rescode="110" data-sr-order="10" data-sr-acttime="4.029">
+        <a
+            class="bar colorSucceeded" 
+            style="height: 7px;"
+            title="Cadastrar no Globo Imprensa, Variant 6 (in Cadastrar no site Globo Imprensa)"
+            href="#t682482251.0">&nbsp;</a>
+    </td>
+    <td class="testview-item" 
+        data-sr-exectime="101.3635729" data-sr-rescode="540" data-sr-order="0" data-sr-acttime="0.024">
+        <a
+            class="bar colorFailed" 
+            style="height: 60px;"
+            title="Cadastrar no Globo Imprensa, Variant 0 (in Cadastrar no site Globo Imprensa)"
+            href="#t1845292433.0">&nbsp;</a>
+    </td>
+    <td class="testview-item" 
+        data-sr-exectime="68.0253511" data-sr-rescode="540" data-sr-order="1" data-sr-acttime="0.039">
+        <a
+            class="bar colorFailed" 
+            style="height: 40px;"
+            title="Cadastrar no Globo Imprensa, Variant 0 (in Cadastrar no site Globo Imprensa) retry #1"
+            href="#t1845292433.1">&nbsp;</a>
+    </td>
+    <td class="testview-item" 
+        data-sr-exectime="64.1797557" data-sr-rescode="540" data-sr-order="6" data-sr-acttime="0.022">
+        <a
+            class="bar colorFailed" 
+            style="height: 38px;"
+            title="Cadastrar no Globo Imprensa, Variant 4 (in Cadastrar no site Globo Imprensa)"
+            href="#t-480070907.0">&nbsp;</a>
+    </td>
+                    <td class="right-padding">&nbsp;</td>
+                </tr>
+                <tr class="horizontal-scale">
+                    <td class="left-padding">&nbsp;</td>
+                    <td colspan="10">&nbsp;</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+        
+        
+    <h2>Feature Summary</h2>
+    <table class="testEvents">
+            <tr>
+            <th>Feature</th>
+        <th colspan="2">Success rate</th>
+        <th>Tests</th>
+        <th>Succeeded</th>
+        <th>Failed</th>
+        <th>Pending</th>
+        <th>Ignored</th>
+        <th>Skipped</th>
+            <th>Duration</th>
+    </tr>
+
+
+            <tr>
+                <td><a href="#f539129112">Cadastrar no site Globo Imprensa</a></td>
+                    <td>
+            73%
+    </td>
+    <td>
+            <table class="timelineview" cellpadding="0" cellspacing="0">
+        <tr>
+    <td>
+        <a class="bar colorSucceeded" 
+           style="width: 228px;" 
+           title="5 succeeded" 
+                   ></a>
+    </td>
+    <td>
+        <a class="bar colorFailed" 
+           style="width: 85px;" 
+           title="0 failed" 
+                          href="#error_summary"
+        ></a>
+    </td>
+        </tr>
+    </table>
+
+    </td>
+    <td>7 (test executions: 11)</td>
+    <td>8</td>
+    <td>3</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+        <td>00:07:50.4278450</td>
+
+            </tr>
+    </table>
+
+
+        <a name="error_summary" />
+        <h2>Error Summary</h2>
+        <table class="testEvents">
+                <tr>
+            <th>Test</th>
+        <th colspan="2">Success rate</th>
+        <th>Tests</th>
+        <th>Succeeded</th>
+        <th>Failed</th>
+        <th>Pending</th>
+        <th>Ignored</th>
+        <th>Skipped</th>
+    </tr>
+
+                <tr>
+                    <td>
+                        <a href="#t1845292433.0">Cadastrar no Globo Imprensa, Variant 0 (in GloboImprensa, Cadastrar no site Globo Imprensa)</a>
+                            <a href="#t1845292433.1">retry #1</a>
+                            <a href="#t1845292433.2">retry #2</a>
+                    </td>
+                        <td>
+            33%
+    </td>
+    <td>
+            <table class="timelineview" cellpadding="0" cellspacing="0">
+        <tr>
+    <td>
+        <a class="bar colorSucceeded" 
+           style="width: 199px;" 
+           title="0 succeeded" 
+                   ></a>
+    </td>
+    <td>
+        <a class="bar colorFailed" 
+           style="width: 399px;" 
+           title="0 failed" 
+                          href="#error_summary"
+        ></a>
+    </td>
+        </tr>
+    </table>
+
+    </td>
+    <td>1 (test executions: 3)</td>
+    <td>1</td>
+    <td>2</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding-left: 20px;"><div class="errorMessage">Error: The HTTP request to the remote WebDriver server for URL http://localhost:53915/session/541d4ec36e36a2811b864025544792eb/screenshot timed out after 60 seconds. -&gt; The operation has timed out., retry #1: The HTTP request to the remote WebDriver server for URL http://localhost:54057/session/51fb26cdd7db2482b860dd42ef533415/url timed out after 60 seconds. -&gt; The operation has timed out.</div></td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="#t-480070907.0">Cadastrar no Globo Imprensa, Variant 4 (in GloboImprensa, Cadastrar no site Globo Imprensa)</a>
+                            <a href="#t-480070907.1">retry #1</a>
+                            <a href="#t-480070907.2">retry #2</a>
+                    </td>
+                        <td>
+            67%
+    </td>
+    <td>
+            <table class="timelineview" cellpadding="0" cellspacing="0">
+        <tr>
+    <td>
+        <a class="bar colorSucceeded" 
+           style="width: 399px;" 
+           title="0 succeeded" 
+                   ></a>
+    </td>
+    <td>
+        <a class="bar colorFailed" 
+           style="width: 199px;" 
+           title="0 failed" 
+                          href="#error_summary"
+        ></a>
+    </td>
+        </tr>
+    </table>
+
+    </td>
+    <td>1 (test executions: 3)</td>
+    <td>2</td>
+    <td>1</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+
+                </tr>
+                <tr>
+                    <td colspan="9" style="padding-left: 20px;"><div class="errorMessage">Error: The HTTP request to the remote WebDriver server for URL http://localhost:54696/session/9f79596b729277b0d82136e22bc4ae14/url timed out after 60 seconds. -&gt; The operation has timed out.</div></td>
+                </tr>
+        </table>
+
+        <h2>Scenario Summary</h2>
+            <a name="f539129112" />
+            <h3>Feature: Cadastrar no site Globo Imprensa</h3>
+                <div class="description"><pre>Narrativa:
+			Eu como usu&#225;rio 
+			Quero Cadastrar no site Globo Imprensa
+			Para acessar a home</pre>
+                </div>
+            <table class="testEvents">
+                    <tr>
+            <th>Test</th>
+        <th colspan="2">Success rate</th>
+        <th>Tests</th>
+        <th>Succeeded</th>
+        <th>Failed</th>
+        <th>Pending</th>
+        <th>Ignored</th>
+        <th>Skipped</th>
+            <th>Duration</th>
+    </tr>
+
+                    <tr>
+                        <td>
+                                    <a href="#t1845292433.0">Scenario: Cadastrar no Globo Imprensa, Variant 0</a>
+            <a href="#t1845292433.1">retry #1</a>
+            <a href="#t1845292433.2">retry #2</a>
+
+                        </td>
+                        
+                            <td>
+            33%
+    </td>
+    <td>
+            <table class="timelineview" cellpadding="0" cellspacing="0">
+        <tr>
+    <td>
+        <a class="bar colorSucceeded" 
+           style="width: 199px;" 
+           title="0 succeeded" 
+                   ></a>
+    </td>
+    <td>
+        <a class="bar colorFailed" 
+           style="width: 399px;" 
+           title="0 failed" 
+                          href="#error_summary"
+        ></a>
+    </td>
+        </tr>
+    </table>
+
+    </td>
+    <td>1 (test executions: 3)</td>
+    <td>1</td>
+    <td>2</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+        <td>00:03:35.9819482</td>
+
+                        
+                    </tr>
+                    <tr>
+                        <td>
+                                    <a href="#t-1961535754.0">Scenario: Cadastrar no Globo Imprensa, Variant 1</a>
+
+                        </td>
+                        
+                            <td>
+            100%
+    </td>
+    <td>
+            <table class="timelineview" cellpadding="0" cellspacing="0">
+        <tr>
+    <td>
+        <a class="bar colorSucceeded" 
+           style="width: 199px;" 
+           title="1 succeeded" 
+                   ></a>
+    </td>
+        </tr>
+    </table>
+
+    </td>
+    <td>1</td>
+    <td>1</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+        <td>00:00:22.1401381</td>
+
+                        
+                    </tr>
+                    <tr>
+                        <td>
+                                    <a href="#t-1290799961.0">Scenario: Cadastrar no Globo Imprensa, Variant 2</a>
+
+                        </td>
+                        
+                            <td>
+            100%
+    </td>
+    <td>
+            <table class="timelineview" cellpadding="0" cellspacing="0">
+        <tr>
+    <td>
+        <a class="bar colorSucceeded" 
+           style="width: 199px;" 
+           title="1 succeeded" 
+                   ></a>
+    </td>
+        </tr>
+    </table>
+
+    </td>
+    <td>1</td>
+    <td>1</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+        <td>00:00:19.6308593</td>
+
+                        
+                    </tr>
+                    <tr>
+                        <td>
+                                    <a href="#t-794527684.0">Scenario: Cadastrar no Globo Imprensa, Variant 3</a>
+
+                        </td>
+                        
+                            <td>
+            100%
+    </td>
+    <td>
+            <table class="timelineview" cellpadding="0" cellspacing="0">
+        <tr>
+    <td>
+        <a class="bar colorSucceeded" 
+           style="width: 199px;" 
+           title="1 succeeded" 
+                   ></a>
+    </td>
+        </tr>
+    </table>
+
+    </td>
+    <td>1</td>
+    <td>1</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+        <td>00:00:43.0678395</td>
+
+                        
+                    </tr>
+                    <tr>
+                        <td>
+                                    <a href="#t-480070907.0">Scenario: Cadastrar no Globo Imprensa, Variant 4</a>
+            <a href="#t-480070907.1">retry #1</a>
+            <a href="#t-480070907.2">retry #2</a>
+
+                        </td>
+                        
+                            <td>
+            67%
+    </td>
+    <td>
+            <table class="timelineview" cellpadding="0" cellspacing="0">
+        <tr>
+    <td>
+        <a class="bar colorSucceeded" 
+           style="width: 399px;" 
+           title="0 succeeded" 
+                   ></a>
+    </td>
+    <td>
+        <a class="bar colorFailed" 
+           style="width: 199px;" 
+           title="0 failed" 
+                          href="#error_summary"
+        ></a>
+    </td>
+        </tr>
+    </table>
+
+    </td>
+    <td>1 (test executions: 3)</td>
+    <td>2</td>
+    <td>1</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+        <td>00:02:13.8306440</td>
+
+                        
+                    </tr>
+                    <tr>
+                        <td>
+                                    <a href="#t12264602.0">Scenario: Cadastrar no Globo Imprensa, Variant 5</a>
+
+                        </td>
+                        
+                            <td>
+            100%
+    </td>
+    <td>
+            <table class="timelineview" cellpadding="0" cellspacing="0">
+        <tr>
+    <td>
+        <a class="bar colorSucceeded" 
+           style="width: 199px;" 
+           title="1 succeeded" 
+                   ></a>
+    </td>
+        </tr>
+    </table>
+
+    </td>
+    <td>1</td>
+    <td>1</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+        <td>00:00:23.8782730</td>
+
+                        
+                    </tr>
+                    <tr>
+                        <td>
+                                    <a href="#t682482251.0">Scenario: Cadastrar no Globo Imprensa, Variant 6</a>
+
+                        </td>
+                        
+                            <td>
+            100%
+    </td>
+    <td>
+            <table class="timelineview" cellpadding="0" cellspacing="0">
+        <tr>
+    <td>
+        <a class="bar colorSucceeded" 
+           style="width: 199px;" 
+           title="1 succeeded" 
+                   ></a>
+    </td>
+        </tr>
+    </table>
+
+    </td>
+    <td>1</td>
+    <td>1</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+        <td>00:00:11.8981429</td>
+
+                        
+                    </tr>
+            </table>
+
+        <h2>Execution Details</h2>
+            <a name="t1845292433.0" />
+            <h3>Scenario: Cadastrar no Globo Imprensa, Variant 0 (in GloboImprensa, Cadastrar no site Globo Imprensa)</h3>
+            <ul>
+                <li>Status: Failed</li>
+                <li>Start time: 22/01/2020 17:27:23</li>
+                <li>Execution time (sec): 101,3635729</li>
+                <li>Thread: #0</li>
+                <li>Error: The HTTP request to the remote WebDriver server for URL http://localhost:53915/session/541d4ec36e36a2811b864025544792eb/screenshot timed out after 60 seconds. -&gt; The operation has timed out.</li>
+            </ul>
+            <table class="testEvents">
+                <tr>
+                    <th>Steps</th>
+                    <th>Trace</th>
+                    <th>Result</th>
+                </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Dado que eu navegue para tela de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestArrange: Scenario - Cadastrar no Globo Imprensa, Variant 0] -->
+                            <pre class="log">2020-01-22T17:27:23.3175663-03:00:Assembly resolving WebDriver, Version=3.141.0.0, Culture=neutral, PublicKeyToken=null
+2020-01-22T17:27:23.3186105-03:00:[AssemblyCache] Trying to resolve 'WebDriver' in folder 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1'
+2020-01-22T17:27:23.3195377-03:00:[AssemblyCache] Trying to resolve 'WebDriver' to 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1\WebDriver.dll'
+2020-01-22T17:27:23.3205080-03:00:[AssemblyCache] Trying to resolve 'WebDriver' to 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1\WebDriver.exe'
+2020-01-22T17:27:23.3212054-03:00:[AssemblyCache] Could not resolve 'WebDriver' in folder 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1'
+2020-01-22T17:27:23.3216636-03:00:[AssemblyCache] Trying to resolve 'WebDriver' from .deps.json file
+2020-01-22T17:27:23.3221795-03:00:[AssemblyCache] Resolved 'WebDriver' to 'C:\Users\Felipe Lima\.nuget\packages\selenium.webdriver\3.141.0\lib\netstandard2.0\WebDriver.dll'
+2020-01-22T17:29:01.2319010-03:00:Assembly resolving System.Net.Sockets.resources, Version=4.2.1.0, Culture=pt-BR, PublicKeyToken=b03f5f7f11d50a3a
+2020-01-22T17:29:01.2332999-03:00:[AssemblyCache] Trying to resolve 'System.Net.Sockets.resources' in folder 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1'
+2020-01-22T17:29:01.2343451-03:00:[AssemblyCache] Trying to resolve 'System.Net.Sockets.resources' to 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1\System.Net.Sockets.resources.dll'
+2020-01-22T17:29:01.2351164-03:00:[AssemblyCache] Trying to resolve 'System.Net.Sockets.resources' to 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1\System.Net.Sockets.resources.exe'
+2020-01-22T17:29:01.2358328-03:00:[AssemblyCache] Could not resolve 'System.Net.Sockets.resources' in folder 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1'
+2020-01-22T17:29:01.2365890-03:00:[AssemblyCache] Trying to resolve 'System.Net.Sockets.resources' from .deps.json file
+2020-01-22T17:29:01.2371857-03:00:[AssemblyCache] Could not resolve 'System.Net.Sockets.resources' from .deps.json
+2020-01-22T17:29:01.2463500-03:00:[AssemblyCache] Trying to resolve 'System.Net.Sockets.resources' in folder 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.All\2.1.13'
+2020-01-22T17:29:01.2474008-03:00:[AssemblyCache] Trying to resolve 'System.Net.Sockets.resources' to 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.All\2.1.13\System.Net.Sockets.resources.dll'
+2020-01-22T17:29:01.2482040-03:00:[AssemblyCache] Trying to resolve 'System.Net.Sockets.resources' to 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.All\2.1.13\System.Net.Sockets.resources.exe'
+2020-01-22T17:29:01.2489970-03:00:[AssemblyCache] Could not resolve 'System.Net.Sockets.resources' in folder 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.All\2.1.13'
+2020-01-22T17:29:01.2496984-03:00:[AssemblyCache] Trying to resolve 'System.Net.Sockets.resources' in folder 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\2.1.13'
+2020-01-22T17:29:01.2501660-03:00:[AssemblyCache] Trying to resolve 'System.Net.Sockets.resources' to 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\2.1.13\System.Net.Sockets.resources.dll'
+2020-01-22T17:29:01.3403786-03:00:[AssemblyCache] Trying to resolve 'System.Net.Sockets.resources' to 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\2.1.13\System.Net.Sockets.resources.exe'
+2020-01-22T17:29:01.3413241-03:00:[AssemblyCache] Could not resolve 'System.Net.Sockets.resources' in folder 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\2.1.13'
+2020-01-22T17:29:01.3423003-03:00:[AssemblyCache] Trying to resolve 'System.Net.Sockets.resources' in folder 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.1.13'
+2020-01-22T17:29:01.3430468-03:00:[AssemblyCache] Trying to resolve 'System.Net.Sockets.resources' to 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.1.13\System.Net.Sockets.resources.dll'
+2020-01-22T17:29:01.3436669-03:00:[AssemblyCache] Trying to resolve 'System.Net.Sockets.resources' to 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.1.13\System.Net.Sockets.resources.exe'
+2020-01-22T17:29:01.3444265-03:00:[AssemblyCache] Could not resolve 'System.Net.Sockets.resources' in folder 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.1.13'
+2020-01-22T17:29:01.3459420-03:00:Assembly resolving System.Net.Sockets.resources, Version=4.2.1.0, Culture=pt, PublicKeyToken=b03f5f7f11d50a3a
+2020-01-22T17:29:02.1651776-03:00:Assembly resolving System.Net.Requests.resources, Version=4.1.1.0, Culture=pt-BR, PublicKeyToken=b03f5f7f11d50a3a
+2020-01-22T17:29:02.1663526-03:00:[AssemblyCache] Trying to resolve 'System.Net.Requests.resources' in folder 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1'
+2020-01-22T17:29:02.1672414-03:00:[AssemblyCache] Trying to resolve 'System.Net.Requests.resources' to 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1\System.Net.Requests.resources.dll'
+2020-01-22T17:29:02.1680854-03:00:[AssemblyCache] Trying to resolve 'System.Net.Requests.resources' to 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1\System.Net.Requests.resources.exe'
+2020-01-22T17:29:02.1688198-03:00:[AssemblyCache] Could not resolve 'System.Net.Requests.resources' in folder 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1'
+2020-01-22T17:29:02.1694197-03:00:[AssemblyCache] Trying to resolve 'System.Net.Requests.resources' from .deps.json file
+2020-01-22T17:29:02.1700093-03:00:[AssemblyCache] Could not resolve 'System.Net.Requests.resources' from .deps.json
+2020-01-22T17:29:02.1711556-03:00:[AssemblyCache] Trying to resolve 'System.Net.Requests.resources' in folder 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.All\2.1.13'
+2020-01-22T17:29:02.1716674-03:00:[AssemblyCache] Trying to resolve 'System.Net.Requests.resources' to 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.All\2.1.13\System.Net.Requests.resources.dll'
+2020-01-22T17:29:02.1720669-03:00:[AssemblyCache] Trying to resolve 'System.Net.Requests.resources' to 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.All\2.1.13\System.Net.Requests.resources.exe'
+2020-01-22T17:29:02.1724710-03:00:[AssemblyCache] Could not resolve 'System.Net.Requests.resources' in folder 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.All\2.1.13'
+2020-01-22T17:29:02.1730860-03:00:[AssemblyCache] Trying to resolve 'System.Net.Requests.resources' in folder 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\2.1.13'
+2020-01-22T17:29:02.1737512-03:00:[AssemblyCache] Trying to resolve 'System.Net.Requests.resources' to 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\2.1.13\System.Net.Requests.resources.dll'
+2020-01-22T17:29:02.1743799-03:00:[AssemblyCache] Trying to resolve 'System.Net.Requests.resources' to 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\2.1.13\System.Net.Requests.resources.exe'
+2020-01-22T17:29:02.1749163-03:00:[AssemblyCache] Could not resolve 'System.Net.Requests.resources' in folder 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\2.1.13'
+2020-01-22T17:29:02.1758278-03:00:[AssemblyCache] Trying to resolve 'System.Net.Requests.resources' in folder 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.1.13'
+2020-01-22T17:29:02.1763815-03:00:[AssemblyCache] Trying to resolve 'System.Net.Requests.resources' to 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.1.13\System.Net.Requests.resources.dll'
+2020-01-22T17:29:02.1769549-03:00:[AssemblyCache] Trying to resolve 'System.Net.Requests.resources' to 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.1.13\System.Net.Requests.resources.exe'
+2020-01-22T17:29:02.1775463-03:00:[AssemblyCache] Could not resolve 'System.Net.Requests.resources' in folder 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.1.13'
+2020-01-22T17:29:02.1784542-03:00:Assembly resolving System.Net.Requests.resources, Version=4.1.1.0, Culture=pt, PublicKeyToken=b03f5f7f11d50a3a
+error: The HTTP request to the remote WebDriver server for URL http://localhost:53915/session/541d4ec36e36a2811b864025544792eb/screenshot timed out after 60 seconds.</pre>
+                                <div class="errorMessage">The HTTP request to the remote WebDriver server for URL http://localhost:53915/session/541d4ec36e36a2811b864025544792eb/screenshot timed out after 60 seconds. -&gt; The operation has timed out.</div>
+                                <pre class="stackTrace">OpenQA.Selenium.WebDriverException: The HTTP request to the remote WebDriver server for URL http://localhost:53915/session/541d4ec36e36a2811b864025544792eb/screenshot timed out after 60 seconds. ---&gt; System.Net.WebException: The operation has timed out.
+   at System.Net.HttpWebRequest.GetResponse()
+   at OpenQA.Selenium.Remote.HttpCommandExecutor.MakeHttpRequest(HttpRequestInfo requestInfo)
+   --- End of inner exception stack trace ---
+   at OpenQA.Selenium.Remote.HttpCommandExecutor.MakeHttpRequest(HttpRequestInfo requestInfo)
+   at OpenQA.Selenium.Remote.HttpCommandExecutor.Execute(Command commandToExecute)
+   at OpenQA.Selenium.Remote.DriverServiceCommandExecutor.Execute(Command commandToExecute)
+   at OpenQA.Selenium.Remote.RemoteWebDriver.Execute(String driverCommandToExecute, Dictionary`2 parameters)
+   at OpenQA.Selenium.Remote.RemoteWebDriver.GetScreenshot()
+   at GloboImprensa.Hooks._Screenshot.GetScreenshot() in C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\Hooks\_Screenshot.cs:line 47
+   at GloboImprensa.Hooks._Screenshot.PrintScreenshot() in C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\Hooks\_Screenshot.cs:line 33
+   at GloboImprensa.Page.Register.Visitar() in C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\Page\Register.cs:line 75
+   at GloboImprensa.Step.CadastraNoSiteGloboImprensaSteps.DadoQueEuNavegueParaTelaDeCadastro() in C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\Step\CadastraNoSiteGloboImprensaSteps.cs:line 31
+   at TechTalk.SpecFlow.Bindings.BindingInvoker.InvokeBinding(IBinding binding, IContextManager contextManager, Object[] arguments, ITestTracer testTracer, TimeSpan&amp; duration) in D:\a\1\s\TechTalk.SpecFlow\Bindings\BindingInvoker.cs:line 69
+   at TechTalk.SpecFlow.Infrastructure.TestExecutionEngine.ExecuteStepMatch(BindingMatch match, Object[] arguments) in D:\a\1\s\TechTalk.SpecFlow\Infrastructure\TestExecutionEngine.cs:line 491
+   at TechTalk.SpecFlow.Infrastructure.TestExecutionEngine.ExecuteStep(IContextManager contextManager, StepInstance stepInstance) in D:\a\1\s\TechTalk.SpecFlow\Infrastructure\TestExecutionEngine.cs:line 412
+   at TechTalk.SpecFlow.Infrastructure.TestExecutionEngine.OnAfterLastStep() in D:\a\1\s\TechTalk.SpecFlow\Infrastructure\TestExecutionEngine.cs:line 256
+   at GloboImprensa.Feature.CadastrarNoSiteGloboImprensaFeature.ScenarioCleanup()
+   at GloboImprensa.Feature.CadastrarNoSiteGloboImprensaFeature.CadastrarNoGloboImprensa(String firstName, String lastName, String nickname, String sex, String email, String office, String publishingCompany, String carrier, String country, String state, String city, String dDDTelephone, String telephone, String dDDCellPhone, String cellPhone, String instagram, String twitter, String password, String repeatPassword, String message, String[] exampleTags) in C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\Feature\GloboImprensa.feature:line 15
+   at GloboImprensa.Feature.CadastrarNoSiteGloboImprensaFeature.CadastrarNoGloboImprensa_Variant0() in C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\Feature\GloboImprensa.feature:line 10
+   at TechTalk.SpecRun.Framework.TaskExecutors.StaticOrInstanceMethodExecutor.ExecuteInternal(ITestThreadExecutionContext testThreadExecutionContext)
+   at TechTalk.SpecRun.Framework.TaskExecutors.StaticOrInstanceMethodExecutor.Execute(ITestThreadExecutionContext testThreadExecutionContext)
+   at TechTalk.SpecRun.Framework.TestNodeTask.Execute()</pre>
+                        </td>
+                        <td>Failed in 100.977s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Quando preencho  os campos de Thamires, Fernandes, Mendes, Feminino, T47654fr27gt8@gmail.com, Editor ,Cultura / Entretenimento, Teste, Brasil, RJ - Rio de Janeiro, Tangu&#225;, 21, 21897656, 21, 23467809, thayn, theuu, Thatha9897@ e Thatha9897@</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 0] -->
+                            <pre class="log">skipped because of previous errors</pre>
+                        </td>
+                        <td>Skipped in 0.023s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">E Clico em SOLICITAR CADASTRO</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 0] -->
+                            <pre class="log">skipped because of previous errors</pre>
+                        </td>
+                        <td>Skipped in 0.001s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Ent&#227;o aguarda a Seu cadastro foi realizado. Aguarde a revis&#227;o e aprova&#231;&#227;o da sua conta.</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAssert: Scenario - Cadastrar no Globo Imprensa, Variant 0] -->
+                            <pre class="log">skipped because of previous errors</pre>
+                        </td>
+                        <td>Skipped in 0.242s</td>
+                    </tr>
+            </table>
+            <a name="t1845292433.1" />
+            <h3>Scenario: Cadastrar no Globo Imprensa, Variant 0 (in GloboImprensa, Cadastrar no site Globo Imprensa) retry #1</h3>
+            <ul>
+                <li>Status: Failed</li>
+                <li>Start time: 22/01/2020 17:29:04</li>
+                <li>Execution time (sec): 68,0253511</li>
+                <li>Thread: #0</li>
+                <li>Error: The HTTP request to the remote WebDriver server for URL http://localhost:54057/session/51fb26cdd7db2482b860dd42ef533415/url timed out after 60 seconds. -&gt; The operation has timed out.</li>
+            </ul>
+            <table class="testEvents">
+                <tr>
+                    <th>Steps</th>
+                    <th>Trace</th>
+                    <th>Result</th>
+                </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Dado que eu navegue para tela de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestArrange: Scenario - Cadastrar no Globo Imprensa, Variant 0] -->
+                            <pre class="log">error: The HTTP request to the remote WebDriver server for URL http://localhost:54057/session/51fb26cdd7db2482b860dd42ef533415/url timed out after 60 seconds.</pre>
+                                <div class="errorMessage">The HTTP request to the remote WebDriver server for URL http://localhost:54057/session/51fb26cdd7db2482b860dd42ef533415/url timed out after 60 seconds. -&gt; The operation has timed out.</div>
+                                <pre class="stackTrace">OpenQA.Selenium.WebDriverException: The HTTP request to the remote WebDriver server for URL http://localhost:54057/session/51fb26cdd7db2482b860dd42ef533415/url timed out after 60 seconds. ---&gt; System.Net.WebException: The operation has timed out.
+   at System.Net.HttpWebRequest.GetResponse()
+   at OpenQA.Selenium.Remote.HttpCommandExecutor.MakeHttpRequest(HttpRequestInfo requestInfo)
+   --- End of inner exception stack trace ---
+   at OpenQA.Selenium.Remote.HttpCommandExecutor.MakeHttpRequest(HttpRequestInfo requestInfo)
+   at OpenQA.Selenium.Remote.HttpCommandExecutor.Execute(Command commandToExecute)
+   at OpenQA.Selenium.Remote.DriverServiceCommandExecutor.Execute(Command commandToExecute)
+   at OpenQA.Selenium.Remote.RemoteWebDriver.Execute(String driverCommandToExecute, Dictionary`2 parameters)
+   at OpenQA.Selenium.Remote.RemoteWebDriver.set_Url(String value)
+   at GloboImprensa.Page.Register.Visitar() in C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\Page\Register.cs:line 74
+   at GloboImprensa.Step.CadastraNoSiteGloboImprensaSteps.DadoQueEuNavegueParaTelaDeCadastro() in C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\Step\CadastraNoSiteGloboImprensaSteps.cs:line 31
+   at TechTalk.SpecFlow.Bindings.BindingInvoker.InvokeBinding(IBinding binding, IContextManager contextManager, Object[] arguments, ITestTracer testTracer, TimeSpan&amp; duration) in D:\a\1\s\TechTalk.SpecFlow\Bindings\BindingInvoker.cs:line 69
+   at TechTalk.SpecFlow.Infrastructure.TestExecutionEngine.ExecuteStepMatch(BindingMatch match, Object[] arguments) in D:\a\1\s\TechTalk.SpecFlow\Infrastructure\TestExecutionEngine.cs:line 491
+   at TechTalk.SpecFlow.Infrastructure.TestExecutionEngine.ExecuteStep(IContextManager contextManager, StepInstance stepInstance) in D:\a\1\s\TechTalk.SpecFlow\Infrastructure\TestExecutionEngine.cs:line 412
+   at TechTalk.SpecFlow.Infrastructure.TestExecutionEngine.OnAfterLastStep() in D:\a\1\s\TechTalk.SpecFlow\Infrastructure\TestExecutionEngine.cs:line 256
+   at GloboImprensa.Feature.CadastrarNoSiteGloboImprensaFeature.ScenarioCleanup()
+   at GloboImprensa.Feature.CadastrarNoSiteGloboImprensaFeature.CadastrarNoGloboImprensa(String firstName, String lastName, String nickname, String sex, String email, String office, String publishingCompany, String carrier, String country, String state, String city, String dDDTelephone, String telephone, String dDDCellPhone, String cellPhone, String instagram, String twitter, String password, String repeatPassword, String message, String[] exampleTags) in C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\Feature\GloboImprensa.feature:line 15
+   at GloboImprensa.Feature.CadastrarNoSiteGloboImprensaFeature.CadastrarNoGloboImprensa_Variant0() in C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\Feature\GloboImprensa.feature:line 10
+   at TechTalk.SpecRun.Framework.TaskExecutors.StaticOrInstanceMethodExecutor.ExecuteInternal(ITestThreadExecutionContext testThreadExecutionContext)
+   at TechTalk.SpecRun.Framework.TaskExecutors.StaticOrInstanceMethodExecutor.Execute(ITestThreadExecutionContext testThreadExecutionContext)
+   at TechTalk.SpecRun.Framework.TestNodeTask.Execute()</pre>
+                        </td>
+                        <td>Failed in 67.983s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Quando preencho  os campos de Thamires, Fernandes, Mendes, Feminino, T47654fr27gt8@gmail.com, Editor ,Cultura / Entretenimento, Teste, Brasil, RJ - Rio de Janeiro, Tangu&#225;, 21, 21897656, 21, 23467809, thayn, theuu, Thatha9897@ e Thatha9897@</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 0] -->
+                            <pre class="log">skipped because of previous errors</pre>
+                        </td>
+                        <td>Skipped in 0.038s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">E Clico em SOLICITAR CADASTRO</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 0] -->
+                            <pre class="log">skipped because of previous errors</pre>
+                        </td>
+                        <td>Skipped in 0.001s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Ent&#227;o aguarda a Seu cadastro foi realizado. Aguarde a revis&#227;o e aprova&#231;&#227;o da sua conta.</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAssert: Scenario - Cadastrar no Globo Imprensa, Variant 0] -->
+                            <pre class="log">skipped because of previous errors</pre>
+                        </td>
+                        <td>Skipped in 0.001s</td>
+                    </tr>
+            </table>
+            <a name="t1845292433.2" />
+            <h3>Scenario: Cadastrar no Globo Imprensa, Variant 0 (in GloboImprensa, Cadastrar no site Globo Imprensa) retry #2</h3>
+            <ul>
+                <li>Status: Succeeded</li>
+                <li>Start time: 22/01/2020 17:30:12</li>
+                <li>Execution time (sec): 46,5930242</li>
+                <li>Thread: #0</li>
+            </ul>
+            <table class="testEvents">
+                <tr>
+                    <th>Steps</th>
+                    <th>Trace</th>
+                    <th>Result</th>
+                </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Dado que eu navegue para tela de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestArrange: Scenario - Cadastrar no Globo Imprensa, Variant 0] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.DadoQueEuNavegueParaTelaDeCadastro() (18,1s)</pre>
+                        </td>
+                        <td>Succeeded in 18.133s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Quando preencho  os campos de Thamires, Fernandes, Mendes, Feminino, T47654fr27gt8@gmail.com, Editor ,Cultura / Entretenimento, Teste, Brasil, RJ - Rio de Janeiro, Tangu&#225;, 21, 21897656, 21, 23467809, thayn, theuu, Thatha9897@ e Thatha9897@</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 0] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoPreenchoOsCamposDeE(&quot;Thamires&quot;, &quot;Fernandes&quot;, &quot;Mendes&quot;, &quot;Feminino&quot;, &quot;T47654fr27gt8@gma...&quot;, &quot;Editor&quot;, &quot;Cultura / Entrete...&quot;, &quot;Teste&quot;, &quot;Brasil&quot;, &quot;RJ - Rio de Janeiro&quot;, &quot;Tangu&#225;&quot;, &quot;21&quot;, &quot;21897656&quot;, &quot;21&quot;, &quot;23467809&quot;, &quot;thayn&quot;, &quot;theuu&quot;, &quot;Thatha9897@&quot;, &quot;Thatha9897@&quot;) (5,1s)</pre>
+                        </td>
+                        <td>Succeeded in 5.148s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">E Clico em SOLICITAR CADASTRO</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 0] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoClicoEmSOLICITARCADASTRO() (20,6s)</pre>
+                        </td>
+                        <td>Succeeded in 20.58s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Ent&#227;o aguarda a Seu cadastro foi realizado. Aguarde a revis&#227;o e aprova&#231;&#227;o da sua conta.</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAssert: Scenario - Cadastrar no Globo Imprensa, Variant 0] -->
+                            <pre class="log">2020-01-22T17:30:56.4313325-03:00:Assembly resolving xunit.assert, Version=2.4.0.4049, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c
+2020-01-22T17:30:56.4325137-03:00:[AssemblyCache] Trying to resolve 'xunit.assert' in folder 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1'
+2020-01-22T17:30:56.4333068-03:00:[AssemblyCache] Trying to resolve 'xunit.assert' to 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1\xunit.assert.dll'
+2020-01-22T17:30:56.4342657-03:00:[AssemblyCache] Trying to resolve 'xunit.assert' to 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1\xunit.assert.exe'
+2020-01-22T17:30:56.4350312-03:00:[AssemblyCache] Could not resolve 'xunit.assert' in folder 'C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1'
+2020-01-22T17:30:56.4358190-03:00:[AssemblyCache] Trying to resolve 'xunit.assert' from .deps.json file
+2020-01-22T17:30:56.6332075-03:00:[AssemblyCache] Resolved 'xunit.assert' to 'C:\Users\Felipe Lima\.nuget\packages\xunit.assert\2.4.0\lib\netstandard2.0\xunit.assert.dll'
+done: CadastraNoSiteGloboImprensaSteps.EntaoAguardaA(&quot;Seu cadastro foi ...&quot;) (2,7s)</pre>
+                        </td>
+                        <td>Succeeded in 2.729s</td>
+                    </tr>
+            </table>
+            <a name="t-1961535754.0" />
+            <h3>Scenario: Cadastrar no Globo Imprensa, Variant 1 (in GloboImprensa, Cadastrar no site Globo Imprensa)</h3>
+            <ul>
+                <li>Status: Succeeded</li>
+                <li>Start time: 22/01/2020 17:30:59</li>
+                <li>Execution time (sec): 22,1401381</li>
+                <li>Thread: #0</li>
+            </ul>
+            <table class="testEvents">
+                <tr>
+                    <th>Steps</th>
+                    <th>Trace</th>
+                    <th>Result</th>
+                </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Dado que eu navegue para tela de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestArrange: Scenario - Cadastrar no Globo Imprensa, Variant 1] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.DadoQueEuNavegueParaTelaDeCadastro() (15,0s)</pre>
+                        </td>
+                        <td>Succeeded in 15.018s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Quando preencho  os campos de Thamires, Fernandes, Mendes, Feminino, Tyyhw@gmail.com, Editor ,Cultura / Entretenimento, Teste, Brasil, RJ - Rio de Janeiro, Tangu&#225;, 21, 21897656, 21, 23467809, thayn, theuu, Thatha9897@ e Thatha9897@</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 1] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoPreenchoOsCamposDeE(&quot;Thamires&quot;, &quot;Fernandes&quot;, &quot;Mendes&quot;, &quot;Feminino&quot;, &quot;Tyyhw@gmail.com&quot;, &quot;Editor&quot;, &quot;Cultura / Entrete...&quot;, &quot;Teste&quot;, &quot;Brasil&quot;, &quot;RJ - Rio de Janeiro&quot;, &quot;Tangu&#225;&quot;, &quot;21&quot;, &quot;21897656&quot;, &quot;21&quot;, &quot;23467809&quot;, &quot;thayn&quot;, &quot;theuu&quot;, &quot;Thatha9897@&quot;, &quot;Thatha9897@&quot;) (3,7s)</pre>
+                        </td>
+                        <td>Succeeded in 3.739s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">E Clico em SOLICITAR CADASTRO</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 1] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoClicoEmSOLICITARCADASTRO() (2,9s)</pre>
+                        </td>
+                        <td>Succeeded in 2.931s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Ent&#227;o aguarda a J&#225; existe um cadastro com este e-mail.</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAssert: Scenario - Cadastrar no Globo Imprensa, Variant 1] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.EntaoAguardaA(&quot;J&#225; existe um cada...&quot;) (0,4s)</pre>
+                        </td>
+                        <td>Succeeded in 0.448s</td>
+                    </tr>
+            </table>
+            <a name="t-1290799961.0" />
+            <h3>Scenario: Cadastrar no Globo Imprensa, Variant 2 (in GloboImprensa, Cadastrar no site Globo Imprensa)</h3>
+            <ul>
+                <li>Status: Succeeded</li>
+                <li>Start time: 22/01/2020 17:31:21</li>
+                <li>Execution time (sec): 19,6308593</li>
+                <li>Thread: #0</li>
+            </ul>
+            <table class="testEvents">
+                <tr>
+                    <th>Steps</th>
+                    <th>Trace</th>
+                    <th>Result</th>
+                </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Dado que eu navegue para tela de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestArrange: Scenario - Cadastrar no Globo Imprensa, Variant 2] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.DadoQueEuNavegueParaTelaDeCadastro() (16,1s)</pre>
+                        </td>
+                        <td>Succeeded in 16.126s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Quando preencho  os campos de , , , , ,  ,, , , , , , , , , , ,  e</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 2] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoPreenchoOsCamposDeE(&quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;) (2,2s)</pre>
+                        </td>
+                        <td>Succeeded in 2.201s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">E Clico em SOLICITAR CADASTRO</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 2] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoClicoEmSOLICITARCADASTRO() (0,8s)</pre>
+                        </td>
+                        <td>Succeeded in 0.798s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Ent&#227;o aguarda a Solicita&#231;&#227;o de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAssert: Scenario - Cadastrar no Globo Imprensa, Variant 2] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.EntaoAguardaA(&quot;Solicita&#231;&#227;o de ca...&quot;) (0,5s)</pre>
+                        </td>
+                        <td>Succeeded in 0.502s</td>
+                    </tr>
+            </table>
+            <a name="t-794527684.0" />
+            <h3>Scenario: Cadastrar no Globo Imprensa, Variant 3 (in GloboImprensa, Cadastrar no site Globo Imprensa)</h3>
+            <ul>
+                <li>Status: Succeeded</li>
+                <li>Start time: 22/01/2020 17:31:40</li>
+                <li>Execution time (sec): 43,0678395</li>
+                <li>Thread: #0</li>
+            </ul>
+            <table class="testEvents">
+                <tr>
+                    <th>Steps</th>
+                    <th>Trace</th>
+                    <th>Result</th>
+                </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Dado que eu navegue para tela de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestArrange: Scenario - Cadastrar no Globo Imprensa, Variant 3] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.DadoQueEuNavegueParaTelaDeCadastro() (39,2s)</pre>
+                        </td>
+                        <td>Succeeded in 39.212s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Quando preencho  os campos de Carlar, , Caca, Feminino, T8r373w@gmail.com, Editor ,Cultura / Entretenimento, Teste, 21, 21897656, 21, 23467809, 21897656, 21, 23467809, thayn, theuu, Thatha9897$ e Thatha9897$</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 3] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoPreenchoOsCamposDeE(&quot;Carlar&quot;, &quot;&quot;, &quot;Caca&quot;, &quot;Feminino&quot;, &quot;T8r373w@gmail.com&quot;, &quot;Editor&quot;, &quot;Cultura / Entrete...&quot;, &quot;Teste&quot;, &quot;21&quot;, &quot;21897656&quot;, &quot;21&quot;, &quot;23467809&quot;, &quot;21897656&quot;, &quot;21&quot;, &quot;23467809&quot;, &quot;thayn&quot;, &quot;theuu&quot;, &quot;Thatha9897$&quot;, &quot;Thatha9897$&quot;) (2,6s)</pre>
+                        </td>
+                        <td>Succeeded in 2.662s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">E Clico em SOLICITAR CADASTRO</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 3] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoClicoEmSOLICITARCADASTRO() (0,7s)</pre>
+                        </td>
+                        <td>Succeeded in 0.692s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Ent&#227;o aguarda a Solicita&#231;&#227;o de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAssert: Scenario - Cadastrar no Globo Imprensa, Variant 3] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.EntaoAguardaA(&quot;Solicita&#231;&#227;o de ca...&quot;) (0,5s)</pre>
+                        </td>
+                        <td>Succeeded in 0.501s</td>
+                    </tr>
+            </table>
+            <a name="t-480070907.0" />
+            <h3>Scenario: Cadastrar no Globo Imprensa, Variant 4 (in GloboImprensa, Cadastrar no site Globo Imprensa)</h3>
+            <ul>
+                <li>Status: Failed</li>
+                <li>Start time: 22/01/2020 17:32:24</li>
+                <li>Execution time (sec): 64,1797557</li>
+                <li>Thread: #0</li>
+                <li>Error: The HTTP request to the remote WebDriver server for URL http://localhost:54696/session/9f79596b729277b0d82136e22bc4ae14/url timed out after 60 seconds. -&gt; The operation has timed out.</li>
+            </ul>
+            <table class="testEvents">
+                <tr>
+                    <th>Steps</th>
+                    <th>Trace</th>
+                    <th>Result</th>
+                </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Dado que eu navegue para tela de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestArrange: Scenario - Cadastrar no Globo Imprensa, Variant 4] -->
+                            <pre class="log">error: The HTTP request to the remote WebDriver server for URL http://localhost:54696/session/9f79596b729277b0d82136e22bc4ae14/url timed out after 60 seconds.</pre>
+                                <div class="errorMessage">The HTTP request to the remote WebDriver server for URL http://localhost:54696/session/9f79596b729277b0d82136e22bc4ae14/url timed out after 60 seconds. -&gt; The operation has timed out.</div>
+                                <pre class="stackTrace">OpenQA.Selenium.WebDriverException: The HTTP request to the remote WebDriver server for URL http://localhost:54696/session/9f79596b729277b0d82136e22bc4ae14/url timed out after 60 seconds. ---&gt; System.Net.WebException: The operation has timed out.
+   at System.Net.HttpWebRequest.GetResponse()
+   at OpenQA.Selenium.Remote.HttpCommandExecutor.MakeHttpRequest(HttpRequestInfo requestInfo)
+   --- End of inner exception stack trace ---
+   at OpenQA.Selenium.Remote.HttpCommandExecutor.MakeHttpRequest(HttpRequestInfo requestInfo)
+   at OpenQA.Selenium.Remote.HttpCommandExecutor.Execute(Command commandToExecute)
+   at OpenQA.Selenium.Remote.DriverServiceCommandExecutor.Execute(Command commandToExecute)
+   at OpenQA.Selenium.Remote.RemoteWebDriver.Execute(String driverCommandToExecute, Dictionary`2 parameters)
+   at OpenQA.Selenium.Remote.RemoteWebDriver.set_Url(String value)
+   at GloboImprensa.Page.Register.Visitar() in C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\Page\Register.cs:line 74
+   at GloboImprensa.Step.CadastraNoSiteGloboImprensaSteps.DadoQueEuNavegueParaTelaDeCadastro() in C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\Step\CadastraNoSiteGloboImprensaSteps.cs:line 31
+   at TechTalk.SpecFlow.Bindings.BindingInvoker.InvokeBinding(IBinding binding, IContextManager contextManager, Object[] arguments, ITestTracer testTracer, TimeSpan&amp; duration) in D:\a\1\s\TechTalk.SpecFlow\Bindings\BindingInvoker.cs:line 69
+   at TechTalk.SpecFlow.Infrastructure.TestExecutionEngine.ExecuteStepMatch(BindingMatch match, Object[] arguments) in D:\a\1\s\TechTalk.SpecFlow\Infrastructure\TestExecutionEngine.cs:line 491
+   at TechTalk.SpecFlow.Infrastructure.TestExecutionEngine.ExecuteStep(IContextManager contextManager, StepInstance stepInstance) in D:\a\1\s\TechTalk.SpecFlow\Infrastructure\TestExecutionEngine.cs:line 412
+   at TechTalk.SpecFlow.Infrastructure.TestExecutionEngine.OnAfterLastStep() in D:\a\1\s\TechTalk.SpecFlow\Infrastructure\TestExecutionEngine.cs:line 256
+   at GloboImprensa.Feature.CadastrarNoSiteGloboImprensaFeature.ScenarioCleanup()
+   at GloboImprensa.Feature.CadastrarNoSiteGloboImprensaFeature.CadastrarNoGloboImprensa(String firstName, String lastName, String nickname, String sex, String email, String office, String publishingCompany, String carrier, String country, String state, String city, String dDDTelephone, String telephone, String dDDCellPhone, String cellPhone, String instagram, String twitter, String password, String repeatPassword, String message, String[] exampleTags) in C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\Feature\GloboImprensa.feature:line 15
+   at GloboImprensa.Feature.CadastrarNoSiteGloboImprensaFeature.CadastrarNoGloboImprensa_Variant4() in C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\Feature\GloboImprensa.feature:line 10
+   at TechTalk.SpecRun.Framework.TaskExecutors.StaticOrInstanceMethodExecutor.ExecuteInternal(ITestThreadExecutionContext testThreadExecutionContext)
+   at TechTalk.SpecRun.Framework.TaskExecutors.StaticOrInstanceMethodExecutor.Execute(ITestThreadExecutionContext testThreadExecutionContext)
+   at TechTalk.SpecRun.Framework.TestNodeTask.Execute()</pre>
+                        </td>
+                        <td>Failed in 64.153s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Quando preencho  os campos de Carlar, Costa, Caca, Feminino, , Editor ,Cultura / Entretenimento, Teste, 21, 21897656, 21, 23467809, 21897656, 21, 23467809, thayn, theuu, Thatha9897$ e Thatha9897$</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 4] -->
+                            <pre class="log">skipped because of previous errors</pre>
+                        </td>
+                        <td>Skipped in 0.021s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">E Clico em SOLICITAR CADASTRO</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 4] -->
+                            <pre class="log">skipped because of previous errors</pre>
+                        </td>
+                        <td>Skipped in 0.001s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Ent&#227;o aguarda a Solicita&#231;&#227;o de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAssert: Scenario - Cadastrar no Globo Imprensa, Variant 4] -->
+                            <pre class="log">skipped because of previous errors</pre>
+                        </td>
+                        <td>Skipped in 0.002s</td>
+                    </tr>
+            </table>
+            <a name="t-480070907.1" />
+            <h3>Scenario: Cadastrar no Globo Imprensa, Variant 4 (in GloboImprensa, Cadastrar no site Globo Imprensa) retry #1</h3>
+            <ul>
+                <li>Status: Succeeded</li>
+                <li>Start time: 22/01/2020 17:33:28</li>
+                <li>Execution time (sec): 38,3026633</li>
+                <li>Thread: #0</li>
+            </ul>
+            <table class="testEvents">
+                <tr>
+                    <th>Steps</th>
+                    <th>Trace</th>
+                    <th>Result</th>
+                </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Dado que eu navegue para tela de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestArrange: Scenario - Cadastrar no Globo Imprensa, Variant 4] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.DadoQueEuNavegueParaTelaDeCadastro() (33,8s)</pre>
+                        </td>
+                        <td>Succeeded in 33.78s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Quando preencho  os campos de Carlar, Costa, Caca, Feminino, , Editor ,Cultura / Entretenimento, Teste, 21, 21897656, 21, 23467809, 21897656, 21, 23467809, thayn, theuu, Thatha9897$ e Thatha9897$</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 4] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoPreenchoOsCamposDeE(&quot;Carlar&quot;, &quot;Costa&quot;, &quot;Caca&quot;, &quot;Feminino&quot;, &quot;&quot;, &quot;Editor&quot;, &quot;Cultura / Entrete...&quot;, &quot;Teste&quot;, &quot;21&quot;, &quot;21897656&quot;, &quot;21&quot;, &quot;23467809&quot;, &quot;21897656&quot;, &quot;21&quot;, &quot;23467809&quot;, &quot;thayn&quot;, &quot;theuu&quot;, &quot;Thatha9897$&quot;, &quot;Thatha9897$&quot;) (2,9s)</pre>
+                        </td>
+                        <td>Succeeded in 2.924s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">E Clico em SOLICITAR CADASTRO</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 4] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoClicoEmSOLICITARCADASTRO() (1,2s)</pre>
+                        </td>
+                        <td>Succeeded in 1.212s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Ent&#227;o aguarda a Solicita&#231;&#227;o de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAssert: Scenario - Cadastrar no Globo Imprensa, Variant 4] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.EntaoAguardaA(&quot;Solicita&#231;&#227;o de ca...&quot;) (0,4s)</pre>
+                        </td>
+                        <td>Succeeded in 0.383s</td>
+                    </tr>
+            </table>
+            <a name="t-480070907.2" />
+            <h3>Scenario: Cadastrar no Globo Imprensa, Variant 4 (in GloboImprensa, Cadastrar no site Globo Imprensa) retry #2</h3>
+            <ul>
+                <li>Status: Succeeded</li>
+                <li>Start time: 22/01/2020 17:34:06</li>
+                <li>Execution time (sec): 31,348225</li>
+                <li>Thread: #0</li>
+            </ul>
+            <table class="testEvents">
+                <tr>
+                    <th>Steps</th>
+                    <th>Trace</th>
+                    <th>Result</th>
+                </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Dado que eu navegue para tela de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestArrange: Scenario - Cadastrar no Globo Imprensa, Variant 4] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.DadoQueEuNavegueParaTelaDeCadastro() (26,0s)</pre>
+                        </td>
+                        <td>Succeeded in 25.972s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Quando preencho  os campos de Carlar, Costa, Caca, Feminino, , Editor ,Cultura / Entretenimento, Teste, 21, 21897656, 21, 23467809, 21897656, 21, 23467809, thayn, theuu, Thatha9897$ e Thatha9897$</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 4] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoPreenchoOsCamposDeE(&quot;Carlar&quot;, &quot;Costa&quot;, &quot;Caca&quot;, &quot;Feminino&quot;, &quot;&quot;, &quot;Editor&quot;, &quot;Cultura / Entrete...&quot;, &quot;Teste&quot;, &quot;21&quot;, &quot;21897656&quot;, &quot;21&quot;, &quot;23467809&quot;, &quot;21897656&quot;, &quot;21&quot;, &quot;23467809&quot;, &quot;thayn&quot;, &quot;theuu&quot;, &quot;Thatha9897$&quot;, &quot;Thatha9897$&quot;) (3,5s)</pre>
+                        </td>
+                        <td>Succeeded in 3.537s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">E Clico em SOLICITAR CADASTRO</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 4] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoClicoEmSOLICITARCADASTRO() (1,1s)</pre>
+                        </td>
+                        <td>Succeeded in 1.073s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Ent&#227;o aguarda a Solicita&#231;&#227;o de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAssert: Scenario - Cadastrar no Globo Imprensa, Variant 4] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.EntaoAguardaA(&quot;Solicita&#231;&#227;o de ca...&quot;) (0,7s)</pre>
+                        </td>
+                        <td>Succeeded in 0.671s</td>
+                    </tr>
+            </table>
+            <a name="t12264602.0" />
+            <h3>Scenario: Cadastrar no Globo Imprensa, Variant 5 (in GloboImprensa, Cadastrar no site Globo Imprensa)</h3>
+            <ul>
+                <li>Status: Succeeded</li>
+                <li>Start time: 22/01/2020 17:34:37</li>
+                <li>Execution time (sec): 23,878273</li>
+                <li>Thread: #0</li>
+            </ul>
+            <table class="testEvents">
+                <tr>
+                    <th>Steps</th>
+                    <th>Trace</th>
+                    <th>Result</th>
+                </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Dado que eu navegue para tela de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestArrange: Scenario - Cadastrar no Globo Imprensa, Variant 5] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.DadoQueEuNavegueParaTelaDeCadastro() (19,5s)</pre>
+                        </td>
+                        <td>Succeeded in 19.55s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Quando preencho  os campos de Carlar, Costa, Caca, Feminino, 4576t76@gmail.com, Editor ,Cultura / Entretenimento, Teste, 21, 21897656, 21, 23467809, 21897656, 21, 23467809, thayn, theuu, Thatha9897$ e</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 5] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoPreenchoOsCamposDeE(&quot;Carlar&quot;, &quot;Costa&quot;, &quot;Caca&quot;, &quot;Feminino&quot;, &quot;4576t76@gmail.com&quot;, &quot;Editor&quot;, &quot;Cultura / Entrete...&quot;, &quot;Teste&quot;, &quot;21&quot;, &quot;21897656&quot;, &quot;21&quot;, &quot;23467809&quot;, &quot;21897656&quot;, &quot;21&quot;, &quot;23467809&quot;, &quot;thayn&quot;, &quot;theuu&quot;, &quot;Thatha9897$&quot;, &quot;&quot;) (3,1s)</pre>
+                        </td>
+                        <td>Succeeded in 3.181s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">E Clico em SOLICITAR CADASTRO</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 5] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoClicoEmSOLICITARCADASTRO() (0,8s)</pre>
+                        </td>
+                        <td>Succeeded in 0.806s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Ent&#227;o aguarda a Solicita&#231;&#227;o de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAssert: Scenario - Cadastrar no Globo Imprensa, Variant 5] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.EntaoAguardaA(&quot;Solicita&#231;&#227;o de ca...&quot;) (0,3s)</pre>
+                        </td>
+                        <td>Succeeded in 0.337s</td>
+                    </tr>
+            </table>
+            <a name="t682482251.0" />
+            <h3>Scenario: Cadastrar no Globo Imprensa, Variant 6 (in GloboImprensa, Cadastrar no site Globo Imprensa)</h3>
+            <ul>
+                <li>Status: Succeeded</li>
+                <li>Start time: 22/01/2020 17:35:01</li>
+                <li>Execution time (sec): 11,8981429</li>
+                <li>Thread: #0</li>
+            </ul>
+            <table class="testEvents">
+                <tr>
+                    <th>Steps</th>
+                    <th>Trace</th>
+                    <th>Result</th>
+                </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Dado que eu navegue para tela de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestArrange: Scenario - Cadastrar no Globo Imprensa, Variant 6] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.DadoQueEuNavegueParaTelaDeCadastro() (7,2s)</pre>
+                        </td>
+                        <td>Succeeded in 7.162s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Quando preencho  os campos de Carlar, Costa, Caca, Feminino, i87y5667@gmail.com, Editor ,Cultura / Entretenimento, Teste, 21, 21897656, 21, 23467809, 21897656, 21, 23467809, thayn, theuu,  e Thatha9897$</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 6] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoPreenchoOsCamposDeE(&quot;Carlar&quot;, &quot;Costa&quot;, &quot;Caca&quot;, &quot;Feminino&quot;, &quot;i87y5667@gmail.com&quot;, &quot;Editor&quot;, &quot;Cultura / Entrete...&quot;, &quot;Teste&quot;, &quot;21&quot;, &quot;21897656&quot;, &quot;21&quot;, &quot;23467809&quot;, &quot;21897656&quot;, &quot;21&quot;, &quot;23467809&quot;, &quot;thayn&quot;, &quot;theuu&quot;, &quot;&quot;, &quot;Thatha9897$&quot;) (3,3s)</pre>
+                        </td>
+                        <td>Succeeded in 3.275s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">E Clico em SOLICITAR CADASTRO</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAct: Scenario - Cadastrar no Globo Imprensa, Variant 6] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.QuandoClicoEmSOLICITARCADASTRO() (0,8s)</pre>
+                        </td>
+                        <td>Succeeded in 0.754s</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <pre class="log">Ent&#227;o aguarda a Solicita&#231;&#227;o de cadastro</pre>
+                        </td>
+                        <td>
+                            <!-- [TestAssert: Scenario - Cadastrar no Globo Imprensa, Variant 6] -->
+                            <pre class="log">done: CadastraNoSiteGloboImprensaSteps.EntaoAguardaA(&quot;Solicita&#231;&#227;o de ca...&quot;) (0,6s)</pre>
+                        </td>
+                        <td>Succeeded in 0.649s</td>
+                    </tr>
+            </table>
+	</body>
+</html>
+</a><div style="position: absolute; top:0px; right:10px; z-index: 1000; text-align: right; font-size: small; color: #FF5555">
+Generated by an evaluation version of SpecRun.<br />
+This version can be used for evaluation purposes only.<br />
+For obtaining a registered license please visit <a href="http://www.specflow.org/plus">http://www.specflow.org/plus</a>.
+</div>

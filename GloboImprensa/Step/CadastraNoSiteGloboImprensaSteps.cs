@@ -4,13 +4,14 @@ using Xunit;
 using OpenQA.Selenium;
 using GloboImprensa.Page;
 using GloboImprensa.Browsers;
-
+using TechTalk.SpecRun;
 
 
 namespace GloboImprensa.Step
 {
     [Binding]
-    
+
+
     public class CadastraNoSiteGloboImprensaSteps
     {
         private IWebDriver driver;
@@ -21,13 +22,10 @@ namespace GloboImprensa.Step
 
             driver = Browsers.Browsers.GetBrowsers(driver, "Chrome");
             login = new Register(driver);
+         
 
 
-        }
-           
-    
-
-
+    }
 
         [Given(@"que eu navegue para tela de cadastro")]
         public void DadoQueEuNavegueParaTelaDeCadastro()
@@ -77,28 +75,20 @@ namespace GloboImprensa.Step
                                 , Twitter
                                 , Password
                                 , RepeatPassword
-
-
-
-
                 );
         }
-        
+
         [When(@"Clico em SOLICITAR CADASTRO")]
         public void QuandoClicoEmSOLICITARCADASTRO()
         {
             login.Submit();
-         
-
         }
-        
+
         [Then(@"aguarda a (.*)")]
         public void EntaoAguardaA(string Menssage)
         {
-
             Assert.Contains(Menssage, driver.PageSource);
             driver.Quit();
-
         }
     }
 }
