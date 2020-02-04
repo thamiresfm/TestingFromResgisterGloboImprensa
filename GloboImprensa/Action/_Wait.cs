@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace GloboImprensa.Hooks
+namespace GloboImprensa.Action
 {
     class _Wait
     {

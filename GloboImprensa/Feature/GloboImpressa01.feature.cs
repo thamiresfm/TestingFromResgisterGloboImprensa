@@ -134,11 +134,11 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Cadastrar no Globo Imprensa com sucesso, Thamires", SourceLine=21)]
+        [TechTalk.SpecRun.ScenarioAttribute("Cadastrar no Globo Imprensa com sucesso, Thamires", SourceLine=20)]
         public virtual void CadastrarNoGloboImprensaComSucesso_Thamires()
         {
 #line 10
-this.CadastrarNoGloboImprensaComSucesso("Thamires", "Fernandes", "Mendes", "Feminino", "T4ttgt8@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "Brasil", "RJ - Rio de Janeiro", "Tanguá", "21", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897@", "Thatha9897@", "Seu cadastro foi realizado. Aguarde a revisão e aprovação da sua conta.", ((string[])(null)));
+this.CadastrarNoGloboImprensaComSucesso("Thamires", "Fernandes", "Mendes", "Feminino", "T87er7tyy38@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "Brasil", "RJ - Rio de Janeiro", "Tanguá", "21", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897@", "Thatha9897@", "Seu cadastro foi realizado. Aguarde a revisão e aprovação da sua conta.", ((string[])(null)));
 #line hidden
         }
         
@@ -167,8 +167,8 @@ this.CadastrarNoGloboImprensaComSucesso("Thamires", "Fernandes", "Mendes", "Femi
         {
             string[] tagsOfScenario = exampleTags;
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Cadastrar no Globo Imprensa sem sucesso", null, exampleTags);
-#line 25
-  this.ScenarioInitialize(scenarioInfo);
+#line 24
+this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
             bool isFeatureIgnored = default(bool);
@@ -187,68 +187,68 @@ this.CadastrarNoGloboImprensaComSucesso("Thamires", "Fernandes", "Mendes", "Femi
             else
             {
                 this.ScenarioStart();
-#line 27
+#line 26
   testRunner.Given("que eu navegue para tela de cadastro", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Dado ");
 #line hidden
-#line 28
+#line 27
   testRunner.When(string.Format("preencho  os campos de {0}, {1}, {2}, {3}, {4}, {5} ,{6}, {7}, {8}, {9}, {10}, {1" +
                             "1}, {12}, {13}, {14}, {15}, {16}, {17} e {18}", firstName, lastName, nickname, sex, email, office, publishingCompany, carrier, country, state, city, dDDTelephone, telephone, dDDCellPhone, cellPhone, instagram, twitter, password, repeatPassword), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Quando ");
 #line hidden
-#line 29
+#line 28
   testRunner.And("Clico em SOLICITAR CADASTRO", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "E ");
 #line hidden
-#line 30
+#line 29
   testRunner.Then(string.Format("aguarda a {0} sem sucesso", message), ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Então ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Cadastrar no Globo Imprensa sem sucesso, Variant 0", SourceLine=36)]
+        [TechTalk.SpecRun.ScenarioAttribute("Cadastrar no Globo Imprensa sem sucesso, Variant 0", SourceLine=35)]
         public virtual void CadastrarNoGloboImprensaSemSucesso_Variant0()
         {
-#line 25
-  this.CadastrarNoGloboImprensaSemSucesso("Thamires", "Fernandes", "Mendes", "Feminino", "Tyyhw@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "Brasil", "RJ - Rio de Janeiro", "Tanguá", "21", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897@", "Thatha9897@", "Já existe um cadastro com este e-mail.", ((string[])(null)));
+#line 24
+this.CadastrarNoGloboImprensaSemSucesso("Thamires", "Fernandes", "Mendes", "Feminino", "T4tywe89338@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "Brasil", "RJ - Rio de Janeiro", "Tanguá", "21", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897@", "Thatha9897@", "Já existe um cadastro com este e-mail.", ((string[])(null)));
 #line hidden
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Cadastrar no Globo Imprensa sem sucesso, Variant 1", SourceLine=36)]
+        [TechTalk.SpecRun.ScenarioAttribute("Cadastrar no Globo Imprensa sem sucesso, Variant 1", SourceLine=35)]
         public virtual void CadastrarNoGloboImprensaSemSucesso_Variant1()
         {
-#line 25
-  this.CadastrarNoGloboImprensaSemSucesso("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "Solicitação de cadastro", ((string[])(null)));
+#line 24
+this.CadastrarNoGloboImprensaSemSucesso("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "Solicitação de cadastro", ((string[])(null)));
 #line hidden
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Cadastrar no Globo Imprensa sem sucesso, Variant 2", SourceLine=36)]
+        [TechTalk.SpecRun.ScenarioAttribute("Cadastrar no Globo Imprensa sem sucesso, Variant 2", SourceLine=35)]
         public virtual void CadastrarNoGloboImprensaSemSucesso_Variant2()
         {
-#line 25
-  this.CadastrarNoGloboImprensaSemSucesso("Carlar", "", "Caca", "Feminino", "T8ryy3w@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "21", "21897656", "21", "23467809", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897$", "Thatha9897$", "Solicitação de cadastro", ((string[])(null)));
+#line 24
+this.CadastrarNoGloboImprensaSemSucesso("Carlar", "", "Caca", "Feminino", "T8ryy3w@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "21", "21897656", "21", "23467809", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897$", "Thatha9897$", "Solicitação de cadastro", ((string[])(null)));
 #line hidden
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Cadastrar no Globo Imprensa sem sucesso, Variant 3", SourceLine=36)]
+        [TechTalk.SpecRun.ScenarioAttribute("Cadastrar no Globo Imprensa sem sucesso, Variant 3", SourceLine=35)]
         public virtual void CadastrarNoGloboImprensaSemSucesso_Variant3()
         {
-#line 25
-  this.CadastrarNoGloboImprensaSemSucesso("Carlar", "Costa", "Caca", "Feminino", "", "Editor", "Cultura / Entretenimento", "Teste", "21", "21897656", "21", "23467809", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897$", "Thatha9897$", "Solicitação de cadastro", ((string[])(null)));
+#line 24
+this.CadastrarNoGloboImprensaSemSucesso("Carlar", "Costa", "Caca", "Feminino", "", "Editor", "Cultura / Entretenimento", "Teste", "21", "21897656", "21", "23467809", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897$", "Thatha9897$", "Solicitação de cadastro", ((string[])(null)));
 #line hidden
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Cadastrar no Globo Imprensa sem sucesso, Variant 4", SourceLine=36)]
+        [TechTalk.SpecRun.ScenarioAttribute("Cadastrar no Globo Imprensa sem sucesso, Variant 4", SourceLine=35)]
         public virtual void CadastrarNoGloboImprensaSemSucesso_Variant4()
         {
-#line 25
-  this.CadastrarNoGloboImprensaSemSucesso("Carlar", "Costa", "Caca", "Feminino", "4576ut76@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "21", "21897656", "21", "23467809", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897$", "", "Solicitação de cadastro", ((string[])(null)));
+#line 24
+this.CadastrarNoGloboImprensaSemSucesso("Carlar", "Costa", "Caca", "Feminino", "4576ut76@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "21", "21897656", "21", "23467809", "21897656", "21", "23467809", "thayn", "theuu", "Thatha9897$", "", "Solicitação de cadastro", ((string[])(null)));
 #line hidden
         }
         
-        [TechTalk.SpecRun.ScenarioAttribute("Cadastrar no Globo Imprensa sem sucesso, Variant 5", SourceLine=36)]
+        [TechTalk.SpecRun.ScenarioAttribute("Cadastrar no Globo Imprensa sem sucesso, Variant 5", SourceLine=35)]
         public virtual void CadastrarNoGloboImprensaSemSucesso_Variant5()
         {
-#line 25
-  this.CadastrarNoGloboImprensaSemSucesso("Carlar", "Costa", "Caca", "Feminino", "i87uiy5667@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "21", "21897656", "21", "23467809", "21897656", "21", "23467809", "thayn", "theuu", "", "Thatha9897$", "Solicitação de cadastro", ((string[])(null)));
+#line 24
+this.CadastrarNoGloboImprensaSemSucesso("Carlar", "Costa", "Caca", "Feminino", "i87uiy5667@gmail.com", "Editor", "Cultura / Entretenimento", "Teste", "21", "21897656", "21", "23467809", "21897656", "21", "23467809", "thayn", "theuu", "", "Thatha9897$", "Solicitação de cadastro", ((string[])(null)));
 #line hidden
         }
         

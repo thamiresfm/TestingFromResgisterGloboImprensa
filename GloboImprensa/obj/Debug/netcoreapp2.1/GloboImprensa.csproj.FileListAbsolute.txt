@@ -490,6 +490,7 @@ C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Co
 C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1\GloboImprensa.runtimeconfig.dev.json
 C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1\GloboImprensa.dll
 C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\bin\Debug\netcoreapp2.1\GloboImprensa.pdb
+C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\obj\Debug\netcoreapp2.1\GloboImprensa.csprojAssemblyReference.cache
 C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\obj\Debug\netcoreapp2.1\GloboImprensa.csproj.CoreCompileInputs.cache
 C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\obj\Debug\netcoreapp2.1\GloboImprensa.AssemblyInfoInputs.cache
 C:\Users\Felipe Lima\OneDrive - Inmetrics\Arquivos Thamires\Thamires\Desafios\Com sucesso\GloboImprensa\GloboImprensa\obj\Debug\netcoreapp2.1\GloboImprensa.AssemblyInfo.cs
