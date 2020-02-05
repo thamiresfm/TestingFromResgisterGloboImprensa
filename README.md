@@ -33,7 +33,7 @@ _ScenarioContext;
 
 _CleanCode;
 
-_Metódos base com eventos personalizados;
+_Metódos base com eventos personalizados; 
 
 _BDD;
 
