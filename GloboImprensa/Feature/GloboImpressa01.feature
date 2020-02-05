@@ -18,7 +18,7 @@ Cenário:  Cadastrar no Globo Imprensa com sucesso
 		
 			#Positivo
 		| FirstName | LastName  | Nickname | Sex      | Email                 | Office | PublishingCompany        | Carrier | Country | State               | City   | DDDTelephone | Telephone | DDDCellPhone | CellPhone | Instagram | Twitter | Password    | RepeatPassword | Message                                                                 |
-		| Thamires  | Fernandes | Mendes   | Feminino | Teste78o38@gmail.com | Editor | Cultura / Entretenimento | Teste   | Brasil  | RJ - Rio de Janeiro | Tanguá | 21           | 21897656  | 21           | 23467809  | thayn     | theuu   | Thatha9897@ | Thatha9897@    | Seu cadastro foi realizado. Aguarde a revisão e aprovação da sua conta. |
+		| Thamires  | Fernandes | Mendes   | Feminino | Tete78o38@gmail.com | Editor | Cultura / Entretenimento | Teste   | Brasil  | RJ - Rio de Janeiro | Tanguá | 21           | 21897656  | 21           | 23467809  | thayn     | theuu   | Thatha9897@ | Thatha9897@    | Seu cadastro foi realizado. Aguarde a revisão e aprovação da sua conta. |
 		
 		
 Cenário:  Cadastrar no Globo Imprensa sem sucesso
